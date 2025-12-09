@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21.0.4"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.sptdataanalysisandreportingtool.RawDataController">
+
+    <top>
+        <Label text="Raw Data Input UI"
+               style="-fx-font-size: 22px; -fx-padding: 20;" />
+    </top>
+
+    <center>
+        <VBox alignment="TOP_CENTER" spacing="15" style="-fx-padding: 20;">
+            <HBox spacing="10">
+                <TextField fx:id="tfDepth" promptText="Depth (m)" />
+                <TextField fx:id="tfN1" promptText="N1 (0–150mm)" />
+                <TextField fx:id="tfN2" promptText="N2 (150–300mm)" />
+                <TextField fx:id="tfN3" promptText="N3 (300–450mm)" />
+                <Button text="Add Reading" onAction="#addReading" />
+            </HBox>
+
+            <TableView fx:id="tableRawData" prefHeight="300">
+                <columns>
+                    <TableColumn text="Depth" prefWidth="120" />
+                    <TableColumn text="N1" prefWidth="80" />
+                    <TableColumn text="N2" prefWidth="80" />
+                    <TableColumn text="N3" prefWidth="80" />
+                    <TableColumn text="N_raw" prefWidth="80" />
+                </columns>
+            </TableView>
+
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Back to Dashboard" onAction="#goDashboard" />
+                <Button text="Go to Analysis" onAction="#goAnalysis" />
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>
