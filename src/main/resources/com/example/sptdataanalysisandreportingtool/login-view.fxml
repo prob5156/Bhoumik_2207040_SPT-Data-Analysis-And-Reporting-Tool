@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="190.0" prefWidth="745.0" spacing="15" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sptdataanalysisandreportingtool.LoginController">
+
+    <Label style="-fx-font-size:24" text="SPT System Login" />
+
+    <TextField fx:id="tfUser" prefHeight="26.0" prefWidth="619.0" promptText="Username" />
+    <PasswordField fx:id="pfPass" promptText="Password" />
+
+    <Button onAction="#login" text="Login" />
+
+    <Label fx:id="lblError" textFill="red" />
+
+</VBox>

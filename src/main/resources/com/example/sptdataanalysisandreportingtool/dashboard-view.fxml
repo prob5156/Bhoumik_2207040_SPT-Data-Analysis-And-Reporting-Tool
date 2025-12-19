@@ -1,52 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21.0.4"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.sptdataanalysisandreportingtool.DashboardController">
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sptdataanalysisandreportingtool.DashboardController">
 
     <top>
-        <Label text="SPT Data Analysis and Reporting Tool"
-               style="-fx-font-size: 24px; -fx-padding: 20;" />
+        <Label style="-fx-font-size:24; -fx-padding:20;" text="Dashboard" />
     </top>
 
     <center>
-        <VBox spacing="20" alignment="TOP_CENTER" BorderPane.alignment="CENTER">
-            <VBox spacing="10" style="-fx-padding: 20; -fx-border-color: #cccccc; -fx-background-color: #f8f8f8;">
-
-                <Label text="Start New SPT Project" style="-fx-font-size: 18px;"/>
-
-                <TextField fx:id="tfProjectName" promptText="Project Name"/>
-                <TextField fx:id="tfBoreholeID" promptText="Borehole ID"/>
-                <TextField fx:id="tfTechnician" promptText="Technician"/>
-
-                <Button text="Create New Borehole"
-                        fx:id="btnCreate"
-                        onAction="#createNewBorehole"/>
-            </VBox>
-
-            <VBox spacing="10" style="-fx-padding: 20;">
-                <Label text="Existing Borehole Records" style="-fx-font-size: 18px;"/>
-
-                <TableView fx:id="tableBoreholes" prefHeight="200">
-                    <columns>
-                        <TableColumn text="Borehole ID" prefWidth="120"/>
-                        <TableColumn text="Project Name" prefWidth="200"/>
-                        <TableColumn text="Location" prefWidth="200"/>
-                        <TableColumn text="Test Date" prefWidth="120"/>
-                    </columns>
-                </TableView>
-
-                <HBox spacing="10" alignment="CENTER">
-                    <Button text="Load Selected" onAction="#loadSelected"/>
-                    <Button text="Delete Selected" onAction="#deleteSelected"/>
-                    <Button text="View Report" onAction="#viewReport"/>
-                </HBox>
-            </VBox>
-
+        <VBox alignment="CENTER" prefHeight="143.0" prefWidth="340.0" spacing="15">
+            <Button onAction="#createNewBorehole" text="Create New Borehole" />
+            <Button onAction="#viewReport" text="View Report" />
         </VBox>
     </center>
 
