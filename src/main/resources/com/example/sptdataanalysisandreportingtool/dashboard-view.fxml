@@ -8,23 +8,26 @@
             fx:controller="com.example.sptdataanalysisandreportingtool.DashboardController">
 
     <top>
-        <Label text="Dashboard"
-               style="-fx-font-size:24; -fx-padding:20;"/>
+        <HBox spacing="20" style="-fx-padding:20;">
+            <Label text="SPT Dashboard" style="-fx-font-size:22;"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblRole"/>
+            <Button text="Logout" onAction="#logout"/>
+        </HBox>
     </top>
 
     <center>
         <VBox spacing="15"
               alignment="CENTER"
               maxWidth="400"
-              BorderPane.alignment="CENTER"
-              style="-fx-padding: 30;">
+              style="-fx-padding:30;">
 
-            <Button text="Create New Borehole"
-                    prefWidth="250"
+            <Button text="Create / Input Raw Data"
+                    prefWidth="260"
                     onAction="#createNewBorehole"/>
 
             <Button text="View Report"
-                    prefWidth="250"
+                    prefWidth="260"
                     onAction="#viewReport"/>
 
         </VBox>
