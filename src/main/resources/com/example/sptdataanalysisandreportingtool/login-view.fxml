@@ -3,15 +3,34 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="190.0" prefWidth="745.0" spacing="15" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sptdataanalysisandreportingtool.LoginController">
+<BorderPane xmlns="http://javafx.com/javafx/21.0.4"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.sptdataanalysisandreportingtool.LoginController">
 
-    <Label style="-fx-font-size:24" text="SPT System Login" />
+    <center>
+        <VBox spacing="15"
+              alignment="CENTER"
+              maxWidth="350"
+              BorderPane.alignment="CENTER"
+              style="-fx-padding: 40;">
 
-    <TextField fx:id="tfUser" prefHeight="26.0" prefWidth="619.0" promptText="Username" />
-    <PasswordField fx:id="pfPass" promptText="Password" />
+            <Label text="SPT System Login"
+                   style="-fx-font-size:24;"/>
 
-    <Button onAction="#login" text="Login" />
+            <TextField fx:id="tfUser"
+                       promptText="Username"/>
 
-    <Label fx:id="lblError" textFill="red" />
+            <PasswordField fx:id="pfPass"
+                           promptText="Password"/>
 
-</VBox>
+            <Button text="Login"
+                    prefWidth="120"
+                    onAction="#login"/>
+
+            <Label fx:id="lblError"
+                   textFill="red"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>
