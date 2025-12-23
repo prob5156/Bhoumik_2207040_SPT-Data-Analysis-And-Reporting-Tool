@@ -3,45 +3,48 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21.0.4"
+<AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.sptdataanalysisandreportingtool.RawDataController">
+            fx:controller="com.example.sptdataanalysisandreportingtool.RawDataController"
+            prefWidth="900" prefHeight="600">
 
-    <top>
-        <Label text="Raw SPT Data Input"
-               style="-fx-font-size:22; -fx-padding:20;"/>
-    </top>
+    <VBox spacing="12"
+          AnchorPane.topAnchor="20"
+          AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20">
 
-    <center>
-        <VBox spacing="15"
-              maxWidth="700"
-              BorderPane.alignment="CENTER"
-              style="-fx-padding: 30;">
+        <Label text="Raw SPT Data Entry"
+               style="-fx-font-size:20; -fx-font-weight:bold;"/>
 
-            <HBox spacing="10">
-                <TextField fx:id="tfDepth" promptText="Depth (m)" prefWidth="120"/>
-                <TextField fx:id="tfN1" promptText="N1" prefWidth="80"/>
-                <TextField fx:id="tfN2" promptText="N2" prefWidth="80"/>
-                <TextField fx:id="tfN3" promptText="N3" prefWidth="80"/>
-                <Button fx:id="btnAdd" text="Add" onAction="#addRow"/>
-            </HBox>
+        <HBox spacing="10">
+            <TextField fx:id="tfDepth" promptText="Depth"/>
+            <TextField fx:id="tfN1" promptText="N1"/>
+            <TextField fx:id="tfN2" promptText="N2"/>
+            <TextField fx:id="tfN3" promptText="N3"/>
+        </HBox>
 
-            <TableView fx:id="table" prefHeight="250">
-                <columns>
-                    <TableColumn fx:id="colDepth" text="Depth (m)" prefWidth="120"/>
-                    <TableColumn fx:id="colN1" text="N1" prefWidth="80"/>
-                    <TableColumn fx:id="colN2" text="N2" prefWidth="80"/>
-                    <TableColumn fx:id="colN3" text="N3" prefWidth="80"/>
-                    <TableColumn fx:id="colNR" text="N-Value" prefWidth="100"/>
-                </columns>
-            </TableView>
+        <TextArea fx:id="taComment"
+                  promptText="Field Comment"
+                  prefHeight="60"/>
 
-            <HBox spacing="15" alignment="CENTER">
-                <Button text="Back to Dashboard" onAction="#back"/>
-                <Button text="Go to Analysis" onAction="#analysis"/>
-            </HBox>
+        <HBox spacing="10">
+            <Button text="Add" onAction="#add"/>
+            <Button text="Update" onAction="#update"/>
+            <Button text="Delete" onAction="#delete"/>
+        </HBox>
 
-        </VBox>
-    </center>
+        <TableView fx:id="table" prefHeight="300">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="40"/>
+                <TableColumn fx:id="colDepth" text="Depth"/>
+                <TableColumn fx:id="colN1" text="N1"/>
+                <TableColumn fx:id="colN2" text="N2"/>
+                <TableColumn fx:id="colN3" text="N3"/>
+                <TableColumn fx:id="colComment" text="Comment" prefWidth="250"/>
+            </columns>
+        </TableView>
 
-</BorderPane>
+        <Button text="Back to Dashboard" onAction="#back"/>
+
+    </VBox>
+</AnchorPane>

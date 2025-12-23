@@ -1,56 +1,77 @@
 package com.example.sptdataanalysisandreportingtool;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
 
 public class AnalysisController {
 
-    @FXML private TextArea analysisText;
-    @FXML private TextArea finalComment;
-    @FXML private Button btnAuthorize;
-    @FXML private Label lblFinal;
+    @FXML
+    private Button btnAnalyze;
 
-    public void initialize() {
-        analysisText.setText(
-                "Depth 1.5m: Medium dense sandy soil\n" +
-                        "Depth 3.0m: Dense sand layer\n" +
-                        "Depth 4.5m: Stiff clay layer"
-        );
+    @FXML
+    private Label lblStatus;
 
-        if(Session.role.equals("SUB")){
-            finalComment.setDisable(true);
-            btnAuthorize.setDisable(true);
-            lblFinal.setText("Senior Engineer Final Comment (Read Only)");
-        }
+    @FXML
+    private TextArea txtResult;
+
+    @FXML
+    private void startAnalysis() {
+
+        btnAnalyze.setDisable(true);
+        lblStatus.setText("Processing SPT data...");
+
+        Task<String> analysisTask = new Task<>() {
+
+            @Override
+            protected String call() throws Exception {
+
+                Thread.sleep(3000);
+
+                StringBuilder result = new StringBuilder();
+                result.append("SPT Analysis Result\n");
+                result.append("--------------------\n");
+                result.append("Depth: 0 – 1.5 m → Loose Sand\n");
+                result.append("Depth: 1.5 – 4.5 m → Medium Dense Sand\n");
+                result.append("Depth: 4.5 – 6.0 m → Dense Sand\n");
+
+                return result.toString();
+            }
+        };
+
+        analysisTask.setOnSucceeded(e -> {
+            txtResult.setText(analysisTask.getValue());
+            lblStatus.setText("Analysis completed successfully.");
+            btnAnalyze.setDisable(false);
+        });
+
+        analysisTask.setOnFailed(e -> {
+            lblStatus.setText("Analysis failed.");
+            btnAnalyze.setDisable(false);
+        });
+
+        Thread t = new Thread(analysisTask);
+        t.setDaemon(true);
+        t.start();
     }
 
-    public void authorize(ActionEvent e){
-        if(Session.role.equals("SENIOR")){
-            btnAuthorize.setText("Authorized ✓");
-            btnAuthorize.setDisable(true);
-        }
-    }
-
-    public void back(ActionEvent e){
-        go("dashboard-view.fxml", e);
-    }
-
-    private void go(String fxml, ActionEvent e){
-        try{
-            Scene sc = new Scene(
-                    new FXMLLoader(
-                            getClass().getResource("/com/example/sptdataanalysisandreportingtool/" + fxml)
-                    ).load()
+    @FXML
+    private void back(ActionEvent e) {
+        try {
+            Parent root = FXMLLoader.load(
+                    getClass().getResource("/com/example/sptdataanalysisandreportingtool/dashboard-view.fxml")
             );
-            Stage st = (Stage)((javafx.scene.Node)e.getSource()).getScene().getWindow();
-            st.setScene(sc);
-        }catch(Exception ex){
+            Stage stage = (Stage) ((javafx.scene.Node) e.getSource())
+                    .getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

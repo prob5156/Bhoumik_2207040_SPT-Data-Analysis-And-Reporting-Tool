@@ -1,94 +1,123 @@
 package com.example.sptdataanalysisandreportingtool;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.collections.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
+
+import java.sql.ResultSet;
 
 public class RawDataController {
 
-    @FXML private TextField tfDepth;
-    @FXML private TextField tfN1;
-    @FXML private TextField tfN2;
-    @FXML private TextField tfN3;
-    @FXML private Button btnAdd;
+    @FXML private TextField tfDepth, tfN1, tfN2, tfN3;
+    @FXML private TextArea taComment;
 
-    @FXML private TableView<Row> table;
-    @FXML private TableColumn<Row,String> colDepth;
-    @FXML private TableColumn<Row,String> colN1;
-    @FXML private TableColumn<Row,String> colN2;
-    @FXML private TableColumn<Row,String> colN3;
-    @FXML private TableColumn<Row,String> colNR;
+    @FXML private TableView<ObservableList<String>> table;
+    @FXML private TableColumn<ObservableList<String>, String> colId, colDepth, colN1, colN2, colN3, colComment;
 
-    private final ObservableList<Row> data = FXCollections.observableArrayList();
+    private int sel = -1;
 
+    @FXML
     public void initialize() {
-        colDepth.setCellValueFactory(d -> d.getValue().depth);
-        colN1.setCellValueFactory(d -> d.getValue().n1);
-        colN2.setCellValueFactory(d -> d.getValue().n2);
-        colN3.setCellValueFactory(d -> d.getValue().n3);
-        colNR.setCellValueFactory(d -> d.getValue().nr);
-        table.setItems(data);
+        DBUtil.init();
 
-        if(Session.role.equals("SENIOR")){
-            btnAdd.setDisable(true);
+        colId.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(0)));
+        colDepth.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(1)));
+        colN1.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(2)));
+        colN2.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(3)));
+        colN3.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(4)));
+        colComment.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(5)));
+
+        table.setOnMouseClicked(e -> pick());
+        load();
+    }
+
+    private void load() {
+        table.getItems().clear();
+        try {
+            ResultSet r = DBUtil.fetchAll();
+            while (r.next()) {
+                ObservableList<String> o = FXCollections.observableArrayList();
+                o.add(r.getString("id"));
+                o.add(r.getString("depth"));
+                o.add(r.getString("n1"));
+                o.add(r.getString("n2"));
+                o.add(r.getString("n3"));
+                o.add(r.getString("comment"));
+                table.getItems().add(o);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void addRow(ActionEvent e){
-        String d=tfDepth.getText();
-        String n1=tfN1.getText();
-        String n2=tfN2.getText();
-        String n3=tfN3.getText();
+    private void pick() {
+        ObservableList<String> r = table.getSelectionModel().getSelectedItem();
+        if (r == null) return;
 
-        if(d.isEmpty()||n1.isEmpty()||n2.isEmpty()||n3.isEmpty()) return;
-
-        int nr=Integer.parseInt(n2)+Integer.parseInt(n3);
-        data.add(new Row(d,n1,n2,n3,String.valueOf(nr)));
-
-        tfDepth.clear();
-        tfN1.clear();
-        tfN2.clear();
-        tfN3.clear();
+        sel = Integer.parseInt(r.get(0));
+        tfDepth.setText(r.get(1));
+        tfN1.setText(r.get(2));
+        tfN2.setText(r.get(3));
+        tfN3.setText(r.get(4));
+        taComment.setText(r.get(5));
     }
 
-    public void back(ActionEvent e){
-        go("dashboard-view.fxml",e);
-    }
-
-    public void analysis(ActionEvent e){
-        go("analysis-view.fxml",e);
-    }
-
-    private void go(String fxml,ActionEvent e){
-        try{
-            Scene sc=new Scene(
-                    new FXMLLoader(
-                            getClass().getResource("/com/example/sptdataanalysisandreportingtool/"+fxml)
-                    ).load()
+    public void add() {
+        try {
+            DBUtil.insert(
+                    Double.parseDouble(tfDepth.getText()),
+                    Integer.parseInt(tfN1.getText()),
+                    Integer.parseInt(tfN2.getText()),
+                    Integer.parseInt(tfN3.getText()),
+                    taComment.getText()
             );
-            Stage st=(Stage)((javafx.scene.Node)e.getSource()).getScene().getWindow();
-            st.setScene(sc);
-        }catch(Exception ex){ex.printStackTrace();}
+            load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static class Row{
-        javafx.beans.property.SimpleStringProperty depth;
-        javafx.beans.property.SimpleStringProperty n1;
-        javafx.beans.property.SimpleStringProperty n2;
-        javafx.beans.property.SimpleStringProperty n3;
-        javafx.beans.property.SimpleStringProperty nr;
+    public void update() {
+        if (sel == -1) return;
+        try {
+            DBUtil.update(
+                    sel,
+                    Double.parseDouble(tfDepth.getText()),
+                    Integer.parseInt(tfN1.getText()),
+                    Integer.parseInt(tfN2.getText()),
+                    Integer.parseInt(tfN3.getText()),
+                    taComment.getText()
+            );
+            load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-        Row(String d,String a,String b,String c,String r){
-            depth=new javafx.beans.property.SimpleStringProperty(d);
-            n1=new javafx.beans.property.SimpleStringProperty(a);
-            n2=new javafx.beans.property.SimpleStringProperty(b);
-            n3=new javafx.beans.property.SimpleStringProperty(c);
-            nr=new javafx.beans.property.SimpleStringProperty(r);
+    public void delete() {
+        if (sel == -1) return;
+        try {
+            DBUtil.delete(sel);
+            load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void back(ActionEvent e) {
+        try {
+            Stage s = (Stage) tfDepth.getScene().getWindow();
+            FXMLLoader f = new FXMLLoader(
+                    getClass().getResource("dashboard-view.fxml")
+            );
+            s.setScene(new Scene(f.load()));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

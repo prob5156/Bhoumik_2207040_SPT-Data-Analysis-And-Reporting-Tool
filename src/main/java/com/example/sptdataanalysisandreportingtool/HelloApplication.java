@@ -8,19 +8,13 @@ import javafx.stage.Stage;
 public class HelloApplication extends Application {
 
     @Override
-    public void start(Stage stage) {
-        try {
-            Scene scene = new Scene(
-                    new FXMLLoader(
-                            getClass().getResource("/com/example/sptdataanalysisandreportingtool/login-view.fxml")
-                    ).load()
-            );
-            stage.setTitle("SPT Data Analysis and Reporting Tool");
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void start(Stage stage) throws Exception {
+        FXMLLoader f = new FXMLLoader(
+                getClass().getResource("login-view.fxml")
+        );
+        stage.setScene(new Scene(f.load()));
+        stage.setTitle("SPT Data Analysis Tool");
+        stage.show();
     }
 
     public static void main(String[] args) {
