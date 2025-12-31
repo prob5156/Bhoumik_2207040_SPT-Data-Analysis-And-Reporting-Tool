@@ -13,8 +13,10 @@
           AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20">
 
-        <Label text="SPT Analysis"
-               style="-fx-font-size:20; -fx-font-weight:bold;"/>
+         <Label fx:id="lblHeader" text="" style="-fx-font-size:14; -fx-font-weight:bold;"/>
+
+         <Label text="SPT Analysis"
+                 style="-fx-font-size:20; -fx-font-weight:bold;"/>
 
         <Button fx:id="btnAnalyze"
                 text="Generate Analysis"

@@ -20,6 +20,9 @@ public class AnalysisController {
     private Label lblStatus;
 
     @FXML
+    private Label lblHeader;
+
+    @FXML
     private TextArea txtResult;
 
     @FXML
@@ -60,6 +63,16 @@ public class AnalysisController {
         Thread t = new Thread(analysisTask);
         t.setDaemon(true);
         t.start();
+    }
+
+    @FXML
+    public void initialize() {
+        if (lblHeader != null) {
+            if ("SENIOR".equalsIgnoreCase(Session.role)) lblHeader.setText("Senior Executive Engineer");
+            else if ("SUB".equalsIgnoreCase(Session.role)) lblHeader.setText("Subconductor Engineer");
+            else if ("CLIENT".equalsIgnoreCase(Session.role)) lblHeader.setText("Client");
+            else lblHeader.setText("");
+        }
     }
 
     @FXML

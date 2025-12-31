@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.sptdataanalysisandreportingtool.EditClientController"
+            prefWidth="500" prefHeight="300">
+
+    <VBox spacing="20" alignment="TOP_CENTER"
+          AnchorPane.topAnchor="40"
+          AnchorPane.leftAnchor="40"
+          AnchorPane.rightAnchor="40"
+          AnchorPane.bottomAnchor="40">
+
+        <Label text="Edit Client" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+
+        <VBox spacing="8">
+            <Label text="Client Name:" style="-fx-font-weight:bold;"/>
+            <TextField fx:id="txfClientName" />
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="Phone Number:" style="-fx-font-weight:bold;"/>
+            <TextField fx:id="txfPhoneNumber" />
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="Password:" style="-fx-font-weight:bold;"/>
+            <PasswordField fx:id="txfPassword" />
+        </VBox>
+
+        <HBox spacing="15" alignment="CENTER">
+            <Button text="Save" onAction="#save" prefWidth="100"/>
+            <Button text="Cancel" onAction="#cancel" prefWidth="100"/>
+        </HBox>
+
+    </VBox>
+</AnchorPane>

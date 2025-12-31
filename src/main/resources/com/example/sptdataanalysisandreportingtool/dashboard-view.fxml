@@ -12,8 +12,10 @@
           AnchorPane.topAnchor="40"
           AnchorPane.leftAnchor="40">
 
-        <Label text="Dashboard"
-               style="-fx-font-size:22; -fx-font-weight:bold;"/>
+       <Label fx:id="lblHeader" text="" style="-fx-font-size:14; -fx-font-weight:bold;"/>
+
+       <Label text="Dashboard"
+         style="-fx-font-size:22; -fx-font-weight:bold;"/>
 
         <Button text="Enter Raw SPT Data" onAction="#openRaw"/>
         <Button text="Run Analysis" onAction="#openAnalysis"/>
