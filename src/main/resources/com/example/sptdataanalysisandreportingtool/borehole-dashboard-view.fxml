@@ -38,6 +38,11 @@
 
         <Label text="Boreholes" style="-fx-font-size:16; -fx-font-weight:bold;"/>
 
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Search:" />
+            <TextField fx:id="tfSearchBoreholes" promptText="Search boreholes by name" />
+        </HBox>
+
         <ScrollPane fitToWidth="true" fitToHeight="true">
             <content>
                 <VBox fx:id="vboxBoreholes" spacing="12" style="-fx-padding: 10;" />

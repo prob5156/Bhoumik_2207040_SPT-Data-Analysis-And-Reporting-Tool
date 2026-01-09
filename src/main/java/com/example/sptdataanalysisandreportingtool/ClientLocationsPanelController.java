@@ -22,6 +22,7 @@ public class ClientLocationsPanelController {
     @FXML private Label lblPhoneNumber;
     @FXML private FlowPane flowPaneLocations;
     @FXML private VBox actionsBox;
+    @FXML private javafx.scene.control.TextField tfSearchLocations;
 
     @FXML
     public void initialize() {
@@ -43,12 +44,35 @@ public class ClientLocationsPanelController {
             refreshLocations();
         }
 
+        if (tfSearchLocations != null) {
+            tfSearchLocations.textProperty().addListener((obs, oldVal, newVal) -> {
+                filterLocations(newVal);
+            });
+        }
+
         // hide action controls for CLIENT and SUB roles
         if (actionsBox != null) {
             if ("CLIENT".equalsIgnoreCase(Session.role) || "SUB".equalsIgnoreCase(Session.role)) {
                 actionsBox.setVisible(false);
             } else {
                 actionsBox.setVisible(true);
+            }
+        }
+    }
+
+    private void filterLocations(String q) {
+        if (flowPaneLocations == null) return;
+        String query = q == null ? "" : q.trim().toLowerCase();
+        for (javafx.scene.Node n : flowPaneLocations.getChildren()) {
+            if (n instanceof javafx.scene.layout.VBox) {
+                javafx.scene.layout.VBox vb = (javafx.scene.layout.VBox) n;
+                // first child expected to be location button
+                if (!vb.getChildren().isEmpty() && vb.getChildren().get(0) instanceof javafx.scene.control.Button) {
+                    javafx.scene.control.Button btn = (javafx.scene.control.Button) vb.getChildren().get(0);
+                    String name = btn.getText() == null ? "" : btn.getText().toLowerCase();
+                    vb.setVisible(query.isEmpty() || name.contains(query));
+                    vb.setManaged(query.isEmpty() || name.contains(query));
+                }
             }
         }
     }

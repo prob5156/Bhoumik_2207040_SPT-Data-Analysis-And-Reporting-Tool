@@ -18,6 +18,7 @@ public class BoreholeDashboardController {
     @FXML private Label lblBoreHoles;
     @FXML private javafx.scene.control.Button btnEditLocation;
     @FXML private VBox vboxBoreholes;
+    @FXML private javafx.scene.control.TextField tfSearchBoreholes;
 
     private int locationId;
     private String locationName;
@@ -46,6 +47,12 @@ public class BoreholeDashboardController {
 
         if (vboxBoreholes != null) {
             refreshBoreholes();
+        }
+
+        if (tfSearchBoreholes != null) {
+            tfSearchBoreholes.textProperty().addListener((obs, oldVal, newVal) -> {
+                filterBoreholes(newVal);
+            });
         }
 
         // hide edit button for clients
@@ -95,6 +102,19 @@ public class BoreholeDashboardController {
             });
 
             vboxBoreholes.getChildren().add(boreholeBtn);
+        }
+    }
+
+    private void filterBoreholes(String q) {
+        if (vboxBoreholes == null) return;
+        String query = q == null ? "" : q.trim().toLowerCase();
+        for (javafx.scene.Node n : vboxBoreholes.getChildren()) {
+            if (n instanceof javafx.scene.control.Button) {
+                javafx.scene.control.Button btn = (javafx.scene.control.Button) n;
+                String name = btn.getText() == null ? "" : btn.getText().toLowerCase();
+                btn.setVisible(query.isEmpty() || name.contains(query));
+                btn.setManaged(query.isEmpty() || name.contains(query));
+            }
         }
     }
 

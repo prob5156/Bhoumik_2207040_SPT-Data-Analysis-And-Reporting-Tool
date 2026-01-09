@@ -38,6 +38,11 @@
 
         <Label text="Locations" style="-fx-font-size:16; -fx-font-weight:bold;"/>
 
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Search:" />
+            <TextField fx:id="tfSearchLocations" promptText="Search locations by name" />
+        </HBox>
+
         <ScrollPane fitToWidth="true" fitToHeight="true">
             <content>
                 <FlowPane fx:id="flowPaneLocations" hgap="12" vgap="12" style="-fx-padding: 10;" />

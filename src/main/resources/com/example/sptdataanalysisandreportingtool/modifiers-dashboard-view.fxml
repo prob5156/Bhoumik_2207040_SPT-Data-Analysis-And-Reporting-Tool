@@ -22,6 +22,11 @@
         <Button fx:id="btnEnterNewClient" text="Enter New Client" onAction="#enterNewClients"/>
       </HBox>
 
+      <HBox spacing="8" alignment="CENTER_LEFT">
+        <Label text="Search:" />
+        <TextField fx:id="tfSearchClients" promptText="Search clients by name" />
+      </HBox>
+
       <Separator/>
 
       <ScrollPane fitToWidth="true" fitToHeight="true">

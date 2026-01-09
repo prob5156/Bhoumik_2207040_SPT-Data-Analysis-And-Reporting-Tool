@@ -24,6 +24,9 @@ public class ModifiersDashboardController {
     private FlowPane flowPaneClients;
 
     @FXML
+    private javafx.scene.control.TextField tfSearchClients;
+
+    @FXML
     private javafx.scene.control.Button btnEnterNewClient;
 
     @FXML
@@ -38,10 +41,34 @@ public class ModifiersDashboardController {
             refreshClients();
         }
 
+        // setup search filtering
+        if (tfSearchClients != null) {
+            tfSearchClients.textProperty().addListener((obs, oldVal, newVal) -> {
+                filterClients(newVal);
+            });
+        }
+
         // Hide the 'Enter New Client' button for SUB users
         if (btnEnterNewClient != null) {
             if ("SUB".equalsIgnoreCase(Session.role)) btnEnterNewClient.setVisible(false);
             else btnEnterNewClient.setVisible(true);
+        }
+    }
+
+    private void filterClients(String q) {
+        if (flowPaneClients == null) return;
+        String query = q == null ? "" : q.trim().toLowerCase();
+        for (javafx.scene.Node n : flowPaneClients.getChildren()) {
+            if (n instanceof javafx.scene.layout.VBox) {
+                javafx.scene.layout.VBox vb = (javafx.scene.layout.VBox) n;
+                // first child should be the client button
+                if (!vb.getChildren().isEmpty() && vb.getChildren().get(0) instanceof javafx.scene.control.Button) {
+                    javafx.scene.control.Button btn = (javafx.scene.control.Button) vb.getChildren().get(0);
+                    String name = btn.getText() == null ? "" : btn.getText().toLowerCase();
+                    vb.setVisible(query.isEmpty() || name.contains(query));
+                    vb.setManaged(query.isEmpty() || name.contains(query));
+                }
+            }
         }
     }
 
