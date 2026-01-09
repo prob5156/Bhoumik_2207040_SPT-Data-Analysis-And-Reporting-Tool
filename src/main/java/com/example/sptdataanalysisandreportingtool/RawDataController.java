@@ -32,6 +32,9 @@ public class RawDataController {
     @FXML private javafx.scene.layout.HBox hboxActions;
     @FXML private Button btnAdd, btnDescribe, btnUpdate, btnDelete, btnDeleteVisualClassification;
     @FXML private Button btnBack;
+    @FXML private Button btnAnalysis;
+    @FXML private Button btnFillingSoil;
+    @FXML private Button btnAnalysisBottom;
 
     private int sel = -1;
     private int visualClassSelId = -1;
@@ -78,8 +81,10 @@ public class RawDataController {
                 table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             }
             table.setEditable(false);
+            if (btnAnalysisBottom != null) btnAnalysisBottom.setVisible(true);
         } else {
             table.setEditable(true);
+            if (btnAnalysisBottom != null) btnAnalysisBottom.setVisible(false);
         }
         colId.setCellFactory(TextFieldTableCell.forTableColumn());
         colId.setOnEditCommit(e -> {
@@ -121,8 +126,171 @@ public class RawDataController {
                 o.add("");
                 table.getItems().add(o);
             }
+            // After loading rows, apply visual classification descriptions
+            applyVisualClassificationDescriptions();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void applyVisualClassificationDescriptions() {
+        try {
+            ResultSet rs = DBUtil.fetchVisualClassificationByBorehole(Session.selectedBorehole, Session.editLocationId);
+            // Clear existing descriptions first
+            for (ObservableList<String> row : table.getItems()) {
+                if (row.size() > 7) row.set(7, "");
+            }
+
+            while (rs.next()) {
+                double from = rs.getDouble("from_depth");
+                double to = rs.getDouble("to_depth");
+                String color = rs.getString("color_code");
+                double sand = rs.getDouble("sand_percentage");
+                double silt = rs.getDouble("silt_percentage");
+                double clay = rs.getDouble("clay_percentage");
+
+                // collect total SPT values for rows within range
+                double minTotal = Double.POSITIVE_INFINITY;
+                double maxTotal = Double.NEGATIVE_INFINITY;
+                for (ObservableList<String> row : table.getItems()) {
+                    try {
+                        double depth = Double.parseDouble(row.get(2));
+                        if (depth >= from && depth <= to) {
+                            String sumStr = row.get(6);
+                            if (sumStr == null || sumStr.isEmpty()) continue;
+                            double val = Double.parseDouble(sumStr);
+                            if (val < minTotal) minTotal = val;
+                            if (val > maxTotal) maxTotal = val;
+                        }
+                    } catch (Exception ex) {
+                        // ignore parse errors
+                    }
+                }
+
+                if (minTotal == Double.POSITIVE_INFINITY) {
+                    // no spt data in range - skip
+                    continue;
+                }
+
+                // Decide which SPT condition table to use
+                boolean useTable2 = sand > clay;
+
+                String condLow = mapSptToCondition(minTotal, useTable2);
+                String condHigh = mapSptToCondition(maxTotal, useTable2);
+                String conditionPart = condLow.equals(condHigh) ? condLow : condLow + " / " + condHigh;
+
+                // Map percentages to terms
+                java.util.Map<String, Double> percMap = new java.util.HashMap<>();
+                percMap.put("sand", sand);
+                percMap.put("silt", silt);
+                percMap.put("clay", clay);
+
+                // For each percentage get term from Table-1
+                java.util.Map<String, String> termMap = new java.util.HashMap<>();
+                for (java.util.Map.Entry<String, Double> e : percMap.entrySet()) {
+                    double p = e.getValue();
+                    if (p <= 0) continue;
+                    termMap.put(e.getKey(), mapPercentageToTerm(p));
+                }
+
+                // Order components by percentage desc
+                java.util.List<java.util.Map.Entry<String, Double>> comps = new java.util.ArrayList<>(percMap.entrySet());
+                comps.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+                // Build component string: highest -> NAME (uppercase), others -> "term name"; external rule: if sand lowest call it "fine sand"
+                StringBuilder compSb = new StringBuilder();
+                for (int i = 0; i < comps.size(); i++) {
+                    String name = comps.get(i).getKey();
+                    double pct = comps.get(i).getValue();
+                    if (pct <= 0) continue;
+                    if (i == 0) {
+                        compSb.append(name.toUpperCase());
+                    } else {
+                        String term = termMap.getOrDefault(name, "");
+                        String displayName = name;
+                        // external rule: if sand is lowest then display 'fine sand'
+                        if (name.equals("sand")) {
+                            // check if sand is lowest among three
+                            double sandPct = percMap.getOrDefault("sand", 0.0);
+                            double siltPct = percMap.getOrDefault("silt", 0.0);
+                            double clayPct = percMap.getOrDefault("clay", 0.0);
+                            if (sandPct <= siltPct && sandPct <= clayPct) {
+                                displayName = "fine sand";
+                            }
+                        }
+                        if (!term.isEmpty()) {
+                            if (compSb.length() > 0) compSb.append(", ");
+                            compSb.append(term.toLowerCase()).append(" ").append(displayName);
+                        } else {
+                            if (compSb.length() > 0) compSb.append(", ");
+                            compSb.append(displayName);
+                        }
+                    }
+                }
+
+                // Compose final description: full color name + condition + components
+                String colorFull = mapColorCode(color);
+                String desc = colorFull;
+                if (!conditionPart.isEmpty()) desc += " " + conditionPart.toLowerCase();
+                if (compSb.length() > 0) desc += " " + compSb.toString();
+
+                // write description only on first matching row to simulate merged cell
+                boolean firstSet = false;
+                for (ObservableList<String> row : table.getItems()) {
+                    try {
+                        double depth = Double.parseDouble(row.get(2));
+                        if (depth >= from && depth <= to) {
+                            if (!firstSet) {
+                                row.set(7, desc);
+                                firstSet = true;
+                            } else {
+                                row.set(7, "");
+                            }
+                        }
+                    } catch (Exception ex) {
+                        // ignore
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String mapPercentageToTerm(double p) {
+        if (p < 5) return "Trace";
+        if (p < 10) return "Few";
+        if (p < 25) return "Little";
+        if (p < 45) return "Some";
+        return "Mostly";
+    }
+
+    private String mapSptToCondition(double val, boolean useTable2) {
+        if (useTable2) {
+            // Table-2
+            if (val <= 4) return "Very Loose";
+            if (val <= 10) return "Loose";
+            if (val <= 25) return "Medium Dense";
+            if (val <= 50) return "Dense";
+            return "Very Dense";
+        } else {
+            // Table-3
+            if (val <= 2) return "Very Soft";
+            if (val <= 4) return "Soft";
+            if (val <= 8) return "Medium Stiff";
+            if (val <= 16) return "Stiff";
+            if (val <= 30) return "Very Stiff";
+            return "Hard";
+        }
+    }
+
+    private String mapColorCode(String code) {
+        if (code == null) return "";
+        switch (code.trim().toUpperCase()) {
+            case "RB": return "Redish Brown";
+            case "BL": return "Black";
+            case "BR": return "Brown";
+            default: return code;
         }
     }
 
@@ -173,15 +341,15 @@ public class RawDataController {
         try {
             double newDepth = Double.parseDouble(tfDepth.getText());
             
-            // Validate depth is in decreasing order
+            // Validate depth is in increasing order (new depth must be greater than last)
             if (!table.getItems().isEmpty()) {
                 ObservableList<String> lastRow = table.getItems().get(table.getItems().size() - 1);
                 double lastDepth = Double.parseDouble(lastRow.get(2));
-                if (newDepth >= lastDepth) {
+                if (newDepth <= lastDepth) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Invalid Depth");
                     alert.setHeaderText("Depth Order Violation");
-                    alert.setContentText("New depth must be less than the previous depth (" + lastDepth + "). Current: " + newDepth);
+                    alert.setContentText("New depth must be greater than the previous depth (" + lastDepth + "). Current: " + newDepth);
                     alert.showAndWait();
                     return;
                 }
@@ -380,6 +548,56 @@ public class RawDataController {
             alert.setHeaderText("Save Failed");
             alert.setContentText("Failed to save visual classification: " + e.getMessage());
             alert.showAndWait();
+        }
+    }
+
+    @FXML
+    public void analysis(ActionEvent e) {
+        if (sel == -1) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText("No Row Selected");
+            alert.setContentText("Please select a row to analyze.");
+            alert.showAndWait();
+            return;
+        }
+
+        try {
+            Session.selectedSptId = sel;
+            FXMLLoader f = new FXMLLoader(getClass().getResource("/com/example/sptdataanalysisandreportingtool/analysis-view.fxml"));
+            Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
+            s.setScene(new Scene(f.load()));
+            s.centerOnScreen();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void fillingSoil(ActionEvent e) {
+        try {
+            ObservableList<String> r = table.getSelectionModel().getSelectedItem();
+            if (r == null) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No Selection");
+                alert.setHeaderText("No Row Selected");
+                alert.setContentText("Please select a row to apply 'Filling Soil'.");
+                alert.showAndWait();
+                return;
+            }
+
+            // set description only to 'Filling Soil' for the selected row
+            if (r.size() > 7) r.set(7, "Filling Soil");
+            else {
+                // ensure list large enough
+                while (r.size() <= 7) r.add("");
+                r.set(7, "Filling Soil");
+            }
+
+            // refresh table view
+            table.refresh();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

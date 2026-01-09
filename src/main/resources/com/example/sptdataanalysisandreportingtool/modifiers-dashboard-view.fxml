@@ -19,6 +19,7 @@
       <HBox alignment="CENTER_LEFT">
         <Label text="Clients" style="-fx-font-size:22; -fx-font-weight:bold;"/>
         <Pane HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnBackModifiers" text="Back" onAction="#back" />
         <Button fx:id="btnEnterNewClient" text="Enter New Client" onAction="#enterNewClients"/>
       </HBox>
 

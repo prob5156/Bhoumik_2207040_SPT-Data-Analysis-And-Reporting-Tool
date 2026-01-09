@@ -14,6 +14,7 @@ public class EditClientController {
     @FXML private TextField txfClientName;
     @FXML private TextField txfPhoneNumber;
     @FXML private javafx.scene.control.PasswordField txfPassword;
+    @FXML private TextField txfPasswordVisible;
 
     private int clientId;
 
@@ -23,7 +24,28 @@ public class EditClientController {
         clientId = Session.clientId;
         txfClientName.setText(Session.clientName);
         txfPhoneNumber.setText(Session.phoneNumber);
-        txfPassword.setText(Session.clientPassword);
+        if (txfPassword != null) txfPassword.setText(Session.clientPassword);
+        if (txfPasswordVisible != null) txfPasswordVisible.setText(Session.clientPassword);
+
+        // Always show the plain-text password field; hide the masked PasswordField
+        if (txfPasswordVisible != null) {
+            txfPasswordVisible.setVisible(true);
+            txfPasswordVisible.setManaged(true);
+        }
+        if (txfPassword != null) {
+            txfPassword.setVisible(false);
+            txfPassword.setManaged(false);
+        }
+
+        // keep password fields in sync
+        if (txfPassword != null && txfPasswordVisible != null) {
+            txfPassword.textProperty().addListener((obs, oldV, newV) -> {
+                if (!txfPasswordVisible.getText().equals(newV)) txfPasswordVisible.setText(newV);
+            });
+            txfPasswordVisible.textProperty().addListener((obs, oldV, newV) -> {
+                if (!txfPassword.getText().equals(newV)) txfPassword.setText(newV);
+            });
+        }
     }
 
     @FXML
@@ -39,7 +61,9 @@ public class EditClientController {
         }
         String name = txfClientName.getText().trim();
         String phone = txfPhoneNumber.getText().trim();
-        String password = txfPassword.getText().trim();
+        String password = "";
+        if (txfPasswordVisible != null && txfPasswordVisible.isVisible()) password = txfPasswordVisible.getText().trim();
+        else if (txfPassword != null) password = txfPassword.getText().trim();
 
         if (name.isEmpty() || phone.isEmpty() || password.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);

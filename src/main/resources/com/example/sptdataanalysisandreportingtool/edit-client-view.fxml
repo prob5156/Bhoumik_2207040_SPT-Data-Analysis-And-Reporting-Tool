@@ -28,7 +28,10 @@
 
         <VBox spacing="8">
             <Label text="Password:" style="-fx-font-weight:bold;"/>
-            <PasswordField fx:id="txfPassword" />
+            <StackPane>
+                <PasswordField fx:id="txfPassword" />
+                <TextField fx:id="txfPasswordVisible" visible="false" managed="false" />
+            </StackPane>
         </VBox>
 
         <HBox spacing="15" alignment="CENTER">

@@ -251,6 +251,13 @@ public class DBUtil {
         return p.executeQuery();
     }
 
+    public static ResultSet fetchSptDataById(int id) throws Exception {
+        Connection c = getConnection();
+        PreparedStatement p = c.prepareStatement("SELECT * FROM spt_data WHERE id=?");
+        p.setInt(1, id);
+        return p.executeQuery();
+    }
+
     public static void updateSptData(int id, String sampleCode, double depth, int n1, int n2, int n3) throws Exception {
         try(Connection c=getConnection();
             PreparedStatement p=c.prepareStatement(

@@ -24,6 +24,9 @@ public class ModifiersDashboardController {
     private FlowPane flowPaneClients;
 
     @FXML
+    private javafx.scene.control.Button btnBackModifiers;
+
+    @FXML
     private javafx.scene.control.TextField tfSearchClients;
 
     @FXML
@@ -47,6 +50,13 @@ public class ModifiersDashboardController {
                 filterClients(newVal);
             });
         }
+        
+            // Back button visibility: show for SENIOR and SUB, hide for CLIENT
+            if (btnBackModifiers != null) {
+                boolean show = "SENIOR".equalsIgnoreCase(Session.role) || "SUB".equalsIgnoreCase(Session.role);
+                btnBackModifiers.setVisible(show);
+                btnBackModifiers.setManaged(show);
+            }
 
         // Hide the 'Enter New Client' button for SUB users
         if (btnEnterNewClient != null) {
@@ -70,6 +80,12 @@ public class ModifiersDashboardController {
                 }
             }
         }
+    }
+
+    @FXML
+    private void back(ActionEvent e) {
+        // For modifiers dashboard Back should take Senior/Sub back to login
+        load("login-view.fxml", e);
     }
 
     private void load(String fxml, ActionEvent e) {
@@ -112,13 +128,23 @@ public class ModifiersDashboardController {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String phone = rs.getString("phone");
+                String pwd = "";
+                try { pwd = rs.getString("password"); } catch (Exception ignored) {}
 
-                // Create a VBox to hold the button and edit button
+                // Create a VBox to hold the button and meta info + edit button
                 VBox clientBox = new VBox(8);
                 clientBox.setStyle("-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 8;");
 
                 // Main client button
                 Button b = new Button(name);
+                // phone and password labels
+                javafx.scene.control.Label phoneLabel = new javafx.scene.control.Label(phone);
+                phoneLabel.setStyle("-fx-font-size:11; -fx-text-fill:#333;");
+                javafx.scene.control.Label pwdLabel = new javafx.scene.control.Label();
+                pwdLabel.setStyle("-fx-font-size:11; -fx-text-fill:#666;");
+                if ("SENIOR".equalsIgnoreCase(Session.role)) {
+                    pwdLabel.setText(pwd == null ? "" : pwd);
+                }
                 String[] palettes = new String[] {
                         "linear-gradient(to bottom right, #ff9a9e, #fecfef)",
                         "linear-gradient(to bottom right, #a18cd1, #fbc2eb)",
@@ -199,10 +225,10 @@ public class ModifiersDashboardController {
                     javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(8);
                     buttonBox.getChildren().addAll(editBtn, deleteBtn);
 
-                    clientBox.getChildren().addAll(b, buttonBox);
+                    clientBox.getChildren().addAll(b, phoneLabel, pwdLabel, buttonBox);
                 } else {
                     // Non-senior roles only see client button
-                    clientBox.getChildren().add(b);
+                    clientBox.getChildren().addAll(b, phoneLabel);
                 }
 
                 flowPaneClients.getChildren().add(clientBox);

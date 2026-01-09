@@ -28,9 +28,11 @@
                 </HBox>
             </VBox>
             <Pane HBox.hgrow="ALWAYS" />
-            <VBox fx:id="actionsBox" alignment="TOP_RIGHT">
-                <Button text="Enter new location" onAction="#enterNewLocation"/>
-                <Button text="Back" onAction="#back"/>
+            <VBox alignment="TOP_RIGHT">
+                <VBox fx:id="enterActionsBox">
+                    <Button fx:id="btnEnterNewLocation" text="Enter new location" onAction="#enterNewLocation"/>
+                </VBox>
+                <Button fx:id="btnBackLocations" text="Back" onAction="#back"/>
             </VBox>
         </HBox>
 

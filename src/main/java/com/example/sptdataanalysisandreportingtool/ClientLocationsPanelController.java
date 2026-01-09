@@ -22,6 +22,9 @@ public class ClientLocationsPanelController {
     @FXML private Label lblPhoneNumber;
     @FXML private FlowPane flowPaneLocations;
     @FXML private VBox actionsBox;
+    @FXML private VBox enterActionsBox;
+    @FXML private javafx.scene.control.Button btnEnterNewLocation;
+    @FXML private javafx.scene.control.Button btnBackLocations;
     @FXML private javafx.scene.control.TextField tfSearchLocations;
 
     @FXML
@@ -50,12 +53,14 @@ public class ClientLocationsPanelController {
             });
         }
 
-        // hide action controls for CLIENT and SUB roles
-        if (actionsBox != null) {
+        // hide only the 'Enter new location' control for CLIENT and SUB roles; keep Back visible
+        if (enterActionsBox != null) {
             if ("CLIENT".equalsIgnoreCase(Session.role) || "SUB".equalsIgnoreCase(Session.role)) {
-                actionsBox.setVisible(false);
+                enterActionsBox.setVisible(false);
+                enterActionsBox.setManaged(false);
             } else {
-                actionsBox.setVisible(true);
+                enterActionsBox.setVisible(true);
+                enterActionsBox.setManaged(true);
             }
         }
     }
@@ -217,9 +222,12 @@ public class ClientLocationsPanelController {
     @FXML
     private void back(ActionEvent e) {
         try {
-                FXMLLoader f = new FXMLLoader(
-                    getClass().getResource("/com/example/sptdataanalysisandreportingtool/modifiers-dashboard-view.fxml")
-                );
+            String target = "/com/example/sptdataanalysisandreportingtool/modifiers-dashboard-view.fxml";
+            if ("CLIENT".equalsIgnoreCase(Session.role)) {
+                // Clients should not see modifiers dashboard; send them to login
+                target = "/com/example/sptdataanalysisandreportingtool/login-view.fxml";
+            }
+            FXMLLoader f = new FXMLLoader(getClass().getResource(target));
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
             s.setScene(new Scene(f.load()));
             s.centerOnScreen();

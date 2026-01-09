@@ -18,17 +18,43 @@
          <Label text="SPT Analysis"
                  style="-fx-font-size:20; -fx-font-weight:bold;"/>
 
-        <Button fx:id="btnAnalyze"
-                text="Generate Analysis"
-                onAction="#startAnalysis"/>
+                <HBox spacing="12">
+                        <VBox>
+                                <Label text="Percentage Terms" style="-fx-font-weight:bold;" />
+                                <TableView fx:id="tblPercentTerms" prefHeight="200" prefWidth="200">
+                                        <columns>
+                                                <TableColumn fx:id="colPercRange" text="Percentage Range" prefWidth="120" />
+                                                <TableColumn fx:id="colTerm" text="Term" prefWidth="80" />
+                                        </columns>
+                                </TableView>
+                        </VBox>
+                        <VBox>
+                                <Label text="Total SPT (Sand&gt;Clay)" style="-fx-font-weight:bold;" />
+                                <TableView fx:id="tblTable2" prefHeight="200" prefWidth="220">
+                                        <columns>
+                                                <TableColumn fx:id="colTotalRange2" text="Total SPT" prefWidth="120" />
+                                                <TableColumn fx:id="colCondition2" text="Condition" prefWidth="100" />
+                                        </columns>
+                                </TableView>
+                        </VBox>
+                        <VBox>
+                                <Label text="Total SPT (Sand&lt;Clay)" style="-fx-font-weight:bold;" />
+                                <TableView fx:id="tblTable3" prefHeight="200" prefWidth="220">
+                                        <columns>
+                                                <TableColumn fx:id="colTotalRange3" text="Total SPT" prefWidth="120" />
+                                                <TableColumn fx:id="colCondition3" text="Condition" prefWidth="100" />
+                                        </columns>
+                                </TableView>
+                        </VBox>
+                </HBox>
 
-        <Label fx:id="lblStatus" text="Status: Idle"/>
+                <Label fx:id="lblStatus" text="Status: Idle"/>
 
-        <TextArea fx:id="txtResult"
-                  prefHeight="300"
-                  promptText="Analysis output will appear here"/>
+                <TextArea fx:id="txtResult"
+                                  prefHeight="200"
+                                  promptText="Analysis output will appear here"/>
 
-        <Button text="Back to Dashboard" onAction="#back"/>
+        <Button text="Back" onAction="#back"/>
 
     </VBox>
 </AnchorPane>

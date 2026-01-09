@@ -15,6 +15,7 @@ public class Session {
     public static String editLocationName = "";
     public static int editBoreHoles = 0;
     public static int selectedBorehole = -1;
+    public static int selectedSptId = -1;
     public static List<Map<String, String>> locations = new ArrayList<>();
     public static List<Map<String, String>> clients = new ArrayList<>();
 
