@@ -34,6 +34,15 @@ public class EnterNewClientController {
 
     @FXML
     private void submit(ActionEvent e) throws java.io.IOException {
+        // Prevent SUB role from entering new locations
+        if ("SUB".equalsIgnoreCase(Session.role)) {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Insufficient Permissions");
+            alert.setContentText("Subconductor Engineer cannot add new locations.");
+            alert.showAndWait();
+            return;
+        }
         String locationName = tfLocationName.getText();
         String boreHoles = tfBoreHoles.getText();
 

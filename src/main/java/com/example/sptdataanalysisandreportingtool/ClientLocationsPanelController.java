@@ -43,9 +43,9 @@ public class ClientLocationsPanelController {
             refreshLocations();
         }
 
-        // hide action controls for clients
+        // hide action controls for CLIENT and SUB roles
         if (actionsBox != null) {
-            if ("CLIENT".equalsIgnoreCase(Session.role)) {
+            if ("CLIENT".equalsIgnoreCase(Session.role) || "SUB".equalsIgnoreCase(Session.role)) {
                 actionsBox.setVisible(false);
             } else {
                 actionsBox.setVisible(true);
@@ -103,7 +103,8 @@ public class ClientLocationsPanelController {
                 locationButton.setWrapText(true);
                 locationButton.setPadding(new Insets(8));
 
-                if (!"CLIENT".equalsIgnoreCase(Session.role)) {
+                // Only SENIOR can edit/delete locations
+                if ("SENIOR".equalsIgnoreCase(Session.role)) {
                     // Edit button
                     Button editBtn = new Button("Edit");
                     editBtn.setStyle("-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
@@ -155,7 +156,7 @@ public class ClientLocationsPanelController {
                     locationBox.getChildren().addAll(locationButton, buttonBox);
                     flowPaneLocations.getChildren().add(locationBox);
                 } else {
-                    // client role: only show the location button (no edit/delete)
+                    // non-senior roles: only show the location button (no edit/delete)
                     locationBox.getChildren().add(locationButton);
                     flowPaneLocations.getChildren().add(locationBox);
                 }
@@ -168,6 +169,16 @@ public class ClientLocationsPanelController {
     @FXML
     private void enterNewLocation(ActionEvent e) {
         try {
+                // Prevent SUB and CLIENT roles from entering new locations
+                if ("SUB".equalsIgnoreCase(Session.role) || "CLIENT".equalsIgnoreCase(Session.role)) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Access Denied");
+                    alert.setHeaderText("Insufficient Permissions");
+                    alert.setContentText("You do not have permission to add new locations.");
+                    alert.showAndWait();
+                    return;
+                }
+
                 FXMLLoader f = new FXMLLoader(
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/enter-new-client-view.fxml")
                 );

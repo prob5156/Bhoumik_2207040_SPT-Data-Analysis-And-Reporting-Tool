@@ -28,6 +28,15 @@ public class EditClientController {
 
     @FXML
     private void save(ActionEvent e) {
+        // Prevent SUB role from saving client edits
+        if ("SUB".equalsIgnoreCase(Session.role)) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Insufficient Permissions");
+            alert.setContentText("Subconductor Engineer cannot edit client details.");
+            alert.showAndWait();
+            return;
+        }
         String name = txfClientName.getText().trim();
         String phone = txfPhoneNumber.getText().trim();
         String password = txfPassword.getText().trim();

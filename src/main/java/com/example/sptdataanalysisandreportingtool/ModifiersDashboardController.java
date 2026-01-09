@@ -24,6 +24,9 @@ public class ModifiersDashboardController {
     private FlowPane flowPaneClients;
 
     @FXML
+    private javafx.scene.control.Button btnEnterNewClient;
+
+    @FXML
     public void initialize() {
         if (lblHeader != null) {
             if ("SENIOR".equalsIgnoreCase(Session.role)) lblHeader.setText("Senior Executive Engineer");
@@ -33,6 +36,12 @@ public class ModifiersDashboardController {
 
         if (flowPaneClients != null) {
             refreshClients();
+        }
+
+        // Hide the 'Enter New Client' button for SUB users
+        if (btnEnterNewClient != null) {
+            if ("SUB".equalsIgnoreCase(Session.role)) btnEnterNewClient.setVisible(false);
+            else btnEnterNewClient.setVisible(true);
         }
     }
 
@@ -54,6 +63,16 @@ public class ModifiersDashboardController {
     }
 
     public void enterNewClients(ActionEvent e){
+        // Prevent SUB role from entering new clients
+        if ("SUB".equalsIgnoreCase(Session.role)) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Insufficient Permissions");
+            alert.setContentText("Subconductor Engineer cannot create new clients.");
+            alert.showAndWait();
+            return;
+        }
+
         load("client-details-view.fxml",e);
     }
 
@@ -102,56 +121,63 @@ public class ModifiersDashboardController {
                     }
                 });
 
-                // Edit button
-                Button editBtn = new Button("Edit");
-                editBtn.setStyle("-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
-                editBtn.setPrefWidth(90);
+                // Only SENIOR role can edit/delete clients
+                if ("SENIOR".equalsIgnoreCase(Session.role)) {
+                    // Edit button
+                    Button editBtn = new Button("Edit");
+                    editBtn.setStyle("-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
+                    editBtn.setPrefWidth(90);
 
-                editBtn.setOnAction(ev -> {
-                    Session.clientId = id;
-                    Session.clientName = name;
-                    Session.phoneNumber = phone;
-                    try {
-                        FXMLLoader f = new FXMLLoader(getClass().getResource("/com/example/sptdataanalysisandreportingtool/edit-client-view.fxml"));
-                        Stage s = (Stage) ((Node) ev.getSource()).getScene().getWindow();
-                        s.setScene(new Scene(f.load()));
-                        s.centerOnScreen();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                });
-
-                // Delete button
-                Button deleteBtn = new Button("Delete");
-                deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
-                deleteBtn.setPrefWidth(90);
-
-                deleteBtn.setOnAction(ev -> {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Confirm Delete");
-                    alert.setHeaderText("Delete Client");
-                    alert.setContentText("Are you sure you want to delete this client? This action cannot be undone.");
-                    java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
-                    if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
+                    editBtn.setOnAction(ev -> {
+                        Session.clientId = id;
+                        Session.clientName = name;
+                        Session.phoneNumber = phone;
                         try {
-                            DBUtil.deleteClient(id);
-                            refreshClients();
+                            FXMLLoader f = new FXMLLoader(getClass().getResource("/com/example/sptdataanalysisandreportingtool/edit-client-view.fxml"));
+                            Stage s = (Stage) ((Node) ev.getSource()).getScene().getWindow();
+                            s.setScene(new Scene(f.load()));
+                            s.centerOnScreen();
                         } catch (Exception ex) {
                             ex.printStackTrace();
-                            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                            errorAlert.setTitle("Error");
-                            errorAlert.setHeaderText("Delete Failed");
-                            errorAlert.setContentText("Failed to delete client: " + ex.getMessage());
-                            errorAlert.showAndWait();
                         }
-                    }
-                });
+                    });
 
-                // HBox to hold Edit and Delete buttons side by side
-                javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(8);
-                buttonBox.getChildren().addAll(editBtn, deleteBtn);
+                    // Delete button
+                    Button deleteBtn = new Button("Delete");
+                    deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
+                    deleteBtn.setPrefWidth(90);
 
-                clientBox.getChildren().addAll(b, buttonBox);
+                    deleteBtn.setOnAction(ev -> {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Confirm Delete");
+                        alert.setHeaderText("Delete Client");
+                        alert.setContentText("Are you sure you want to delete this client? This action cannot be undone.");
+                        java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
+                        if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
+                            try {
+                                DBUtil.deleteClient(id);
+                                refreshClients();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                                errorAlert.setTitle("Error");
+                                errorAlert.setHeaderText("Delete Failed");
+                                errorAlert.setContentText("Failed to delete client: " + ex.getMessage());
+                                errorAlert.showAndWait();
+                            }
+                        }
+                    });
+
+                    // HBox to hold Edit and Delete buttons side by side
+                    javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(8);
+                    buttonBox.getChildren().addAll(editBtn, deleteBtn);
+
+                    clientBox.getChildren().addAll(b, buttonBox);
+                } else {
+                    // Non-senior roles only see client button
+                    clientBox.getChildren().add(b);
+                }
+
                 flowPaneClients.getChildren().add(clientBox);
             }
         } catch (Exception ex) {

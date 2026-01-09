@@ -27,6 +27,15 @@ public class ClientDetailsController {
 
     @FXML
     private void submit(ActionEvent e) {
+        // Prevent SUB role from creating new clients
+        if ("SUB".equalsIgnoreCase(Session.role)) {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Insufficient Permissions");
+            alert.setContentText("Subconductor Engineer cannot create new clients.");
+            alert.showAndWait();
+            return;
+        }
         String clientName = tfClientName.getText();
         String phoneNumber = tfPhoneNumber.getText();
         String password = tfPassword.getText();

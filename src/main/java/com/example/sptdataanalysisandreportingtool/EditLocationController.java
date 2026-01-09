@@ -33,6 +33,15 @@ public class EditLocationController {
 
     @FXML
     private void save(ActionEvent e) {
+        // Prevent SUB role from saving location edits
+        if ("SUB".equalsIgnoreCase(Session.role)) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Insufficient Permissions");
+            alert.setContentText("Subconductor Engineer cannot edit locations.");
+            alert.showAndWait();
+            return;
+        }
         String name = txfLocationName.getText().trim();
         String holesStr = txfBoreHoles.getText().trim();
 

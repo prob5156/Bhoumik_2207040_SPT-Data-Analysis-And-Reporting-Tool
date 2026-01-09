@@ -9,6 +9,9 @@ import javafx.stage.Stage;
 import javafx.collections.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.Node;
 
 import java.sql.ResultSet;
 
@@ -21,6 +24,14 @@ public class RawDataController {
 
     @FXML private TableView<ObservableList<String>> table;
     @FXML private TableColumn<ObservableList<String>, String> colId, colDepth, colN1, colN2, colN3, colSum, colDescription;
+
+    @FXML private VBox rootVBox;
+    @FXML private javafx.scene.layout.HBox hboxEntry;
+    @FXML private javafx.scene.layout.HBox hboxVisual;
+    @FXML private javafx.scene.layout.HBox hboxDescribe;
+    @FXML private javafx.scene.layout.HBox hboxActions;
+    @FXML private Button btnAdd, btnDescribe, btnUpdate, btnDelete, btnDeleteVisualClassification;
+    @FXML private Button btnBack;
 
     private int sel = -1;
     private int visualClassSelId = -1;
@@ -52,7 +63,24 @@ public class RawDataController {
         colSum.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(6)));
         colDescription.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get(7)));
 
-        table.setEditable(true);
+        // For CLIENT role, make table view-only and expand it to fill available space
+        if ("CLIENT".equalsIgnoreCase(Session.role)) {
+            if (hboxEntry != null) hboxEntry.setVisible(false);
+            if (hboxVisual != null) hboxVisual.setVisible(false);
+            if (hboxDescribe != null) hboxDescribe.setVisible(false);
+            if (hboxActions != null) hboxActions.setVisible(false);
+
+            // Ensure only the table remains in the main VBox so it stretches
+            if (rootVBox != null && table != null) {
+                // keep the table and the Back button; remove other nodes
+                rootVBox.getChildren().removeIf(n -> n != table && n != btnBack);
+                VBox.setVgrow(table, Priority.ALWAYS);
+                table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            }
+            table.setEditable(false);
+        } else {
+            table.setEditable(true);
+        }
         colId.setCellFactory(TextFieldTableCell.forTableColumn());
         colId.setOnEditCommit(e -> {
             try {
@@ -257,7 +285,7 @@ public class RawDataController {
 
     public void back(ActionEvent e) {
         try {
-            Stage s = (Stage) tfDepth.getScene().getWindow();
+            Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
             FXMLLoader f = new FXMLLoader(
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/borehole-dashboard-view.fxml")
             );
