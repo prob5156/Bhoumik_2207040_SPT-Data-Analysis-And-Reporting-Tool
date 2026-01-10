@@ -33,7 +33,9 @@ public class DashboardController {
                     getClass().getResource(fxml)
             );
             Stage s=(Stage)((Node)e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch(Exception ex){
             ex.printStackTrace();
         }

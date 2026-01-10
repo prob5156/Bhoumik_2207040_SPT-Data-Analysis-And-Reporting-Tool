@@ -65,8 +65,9 @@ public class EnterNewClientController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/client-locations-panel-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
-            s.centerOnScreen();
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
             s.centerOnScreen();
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
@@ -82,7 +83,9 @@ public class EnterNewClientController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/client-locations-panel-view.fxml")
                 );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
             s.centerOnScreen();
         } catch (Exception ex) {
             ex.printStackTrace();

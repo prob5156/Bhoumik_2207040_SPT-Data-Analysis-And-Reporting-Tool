@@ -8,28 +8,32 @@
             fx:controller="com.example.sptdataanalysisandreportingtool.EditLocationController"
             prefWidth="500" prefHeight="350">
 
-    <VBox spacing="20" alignment="TOP_CENTER"
-          AnchorPane.topAnchor="40"
-          AnchorPane.leftAnchor="40"
-          AnchorPane.rightAnchor="40"
-          AnchorPane.bottomAnchor="40">
+    <VBox alignment="CENTER" spacing="12.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="40.0" AnchorPane.bottomAnchor="40.0">
+        <children>
+            <Region prefHeight="20" />
+            <VBox fx:id="card" alignment="CENTER" spacing="14.0" styleClass="pane" prefWidth="520">
+                <children>
+                    <Label text="Edit Location" styleClass="header-large" />
 
-        <Label text="Edit Location" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+                    <VBox spacing="8" prefWidth="360">
+                        <children>
+                            <Label text="Location Name:" />
+                            <TextField fx:id="txfLocationName" />
 
-        <VBox spacing="8">
-            <Label text="Location Name:" style="-fx-font-weight:bold;"/>
-            <TextField fx:id="txfLocationName" />
-        </VBox>
+                            <Label text="Number of Bore Holes:" />
+                            <TextField fx:id="txfBoreHoles" />
+                        </children>
+                    </VBox>
 
-        <VBox spacing="8">
-            <Label text="Number of Bore Holes:" style="-fx-font-weight:bold;"/>
-            <TextField fx:id="txfBoreHoles" />
-        </VBox>
-
-        <HBox spacing="15" alignment="CENTER">
-            <Button text="Save" onAction="#save" prefWidth="100"/>
-            <Button text="Cancel" onAction="#cancel" prefWidth="100"/>
-        </HBox>
-
+                    <HBox spacing="15" alignment="CENTER">
+                        <children>
+                            <Button text="Save" onAction="#save" prefWidth="100" />
+                            <Button text="Cancel" onAction="#cancel" prefWidth="100" />
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            <Region prefHeight="10" />
+        </children>
     </VBox>
 </AnchorPane>

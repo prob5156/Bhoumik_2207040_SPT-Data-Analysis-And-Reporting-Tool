@@ -14,6 +14,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.Node;
 
 import java.sql.ResultSet;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RawDataController {
 
@@ -33,7 +37,6 @@ public class RawDataController {
     @FXML private Button btnAdd, btnDescribe, btnUpdate, btnDelete, btnDeleteVisualClassification;
     @FXML private Button btnBack;
     @FXML private Button btnAnalysis;
-    @FXML private Button btnFillingSoil;
     @FXML private Button btnAnalysisBottom;
 
     private int sel = -1;
@@ -109,23 +112,29 @@ public class RawDataController {
 
     private void load() {
         table.getItems().clear();
-        try {
-            ResultSet r = DBUtil.fetchSptDataByBorehole(Session.selectedBorehole, Session.editLocationId);
-            while (r.next()) {
-                ObservableList<String> o = FXCollections.observableArrayList();
-                int id = r.getInt("id");
-                o.add(String.valueOf(id));
-                o.add(r.getString("sample_code"));
-                o.add(r.getString("depth"));
-                o.add(r.getString("n1"));
-                o.add(r.getString("n2"));
-                o.add(r.getString("n3"));
-                int n2 = r.getInt("n2");
-                int n3 = r.getInt("n3");
-                o.add(String.valueOf(n2 + n3));
-                o.add("");
-                table.getItems().add(o);
+        String sql = "SELECT * FROM spt_data WHERE borehole_id=? AND location_id=? ORDER BY id";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement p = c.prepareStatement(sql)) {
+            p.setInt(1, Session.selectedBorehole);
+            p.setInt(2, Session.editLocationId);
+            try (ResultSet r = p.executeQuery()) {
+                while (r.next()) {
+                    ObservableList<String> o = FXCollections.observableArrayList();
+                    int id = r.getInt("id");
+                    o.add(String.valueOf(id));
+                    o.add(r.getString("sample_code"));
+                    o.add(r.getString("depth"));
+                    o.add(r.getString("n1"));
+                    o.add(r.getString("n2"));
+                    o.add(r.getString("n3"));
+                    int n2 = r.getInt("n2");
+                    int n3 = r.getInt("n3");
+                    o.add(String.valueOf(n2 + n3));
+                    o.add("");
+                    table.getItems().add(o);
+                }
             }
+
             // After loading rows, apply visual classification descriptions
             applyVisualClassificationDescriptions();
         } catch (Exception e) {
@@ -134,121 +143,125 @@ public class RawDataController {
     }
 
     private void applyVisualClassificationDescriptions() {
-        try {
-            ResultSet rs = DBUtil.fetchVisualClassificationByBorehole(Session.selectedBorehole, Session.editLocationId);
-            // Clear existing descriptions first
-            for (ObservableList<String> row : table.getItems()) {
-                if (row.size() > 7) row.set(7, "");
-            }
+        String sql = "SELECT * FROM visual_classification WHERE borehole_id=? AND location_id=? ORDER BY from_depth";
+        // Clear existing descriptions first
+        for (ObservableList<String> row : table.getItems()) {
+            if (row.size() > 7) row.set(7, "");
+        }
 
-            while (rs.next()) {
-                double from = rs.getDouble("from_depth");
-                double to = rs.getDouble("to_depth");
-                String color = rs.getString("color_code");
-                double sand = rs.getDouble("sand_percentage");
-                double silt = rs.getDouble("silt_percentage");
-                double clay = rs.getDouble("clay_percentage");
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement p = c.prepareStatement(sql)) {
+            p.setInt(1, Session.selectedBorehole);
+            p.setInt(2, Session.editLocationId);
+            try (ResultSet rs = p.executeQuery()) {
+                while (rs.next()) {
+                    double from = rs.getDouble("from_depth");
+                    double to = rs.getDouble("to_depth");
+                    String color = rs.getString("color_code");
+                    double sand = rs.getDouble("sand_percentage");
+                    double silt = rs.getDouble("silt_percentage");
+                    double clay = rs.getDouble("clay_percentage");
 
-                // collect total SPT values for rows within range
-                double minTotal = Double.POSITIVE_INFINITY;
-                double maxTotal = Double.NEGATIVE_INFINITY;
-                for (ObservableList<String> row : table.getItems()) {
-                    try {
-                        double depth = Double.parseDouble(row.get(2));
-                        if (depth >= from && depth <= to) {
-                            String sumStr = row.get(6);
-                            if (sumStr == null || sumStr.isEmpty()) continue;
-                            double val = Double.parseDouble(sumStr);
-                            if (val < minTotal) minTotal = val;
-                            if (val > maxTotal) maxTotal = val;
-                        }
-                    } catch (Exception ex) {
-                        // ignore parse errors
-                    }
-                }
-
-                if (minTotal == Double.POSITIVE_INFINITY) {
-                    // no spt data in range - skip
-                    continue;
-                }
-
-                // Decide which SPT condition table to use
-                boolean useTable2 = sand > clay;
-
-                String condLow = mapSptToCondition(minTotal, useTable2);
-                String condHigh = mapSptToCondition(maxTotal, useTable2);
-                String conditionPart = condLow.equals(condHigh) ? condLow : condLow + " / " + condHigh;
-
-                // Map percentages to terms
-                java.util.Map<String, Double> percMap = new java.util.HashMap<>();
-                percMap.put("sand", sand);
-                percMap.put("silt", silt);
-                percMap.put("clay", clay);
-
-                // For each percentage get term from Table-1
-                java.util.Map<String, String> termMap = new java.util.HashMap<>();
-                for (java.util.Map.Entry<String, Double> e : percMap.entrySet()) {
-                    double p = e.getValue();
-                    if (p <= 0) continue;
-                    termMap.put(e.getKey(), mapPercentageToTerm(p));
-                }
-
-                // Order components by percentage desc
-                java.util.List<java.util.Map.Entry<String, Double>> comps = new java.util.ArrayList<>(percMap.entrySet());
-                comps.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
-
-                // Build component string: highest -> NAME (uppercase), others -> "term name"; external rule: if sand lowest call it "fine sand"
-                StringBuilder compSb = new StringBuilder();
-                for (int i = 0; i < comps.size(); i++) {
-                    String name = comps.get(i).getKey();
-                    double pct = comps.get(i).getValue();
-                    if (pct <= 0) continue;
-                    if (i == 0) {
-                        compSb.append(name.toUpperCase());
-                    } else {
-                        String term = termMap.getOrDefault(name, "");
-                        String displayName = name;
-                        // external rule: if sand is lowest then display 'fine sand'
-                        if (name.equals("sand")) {
-                            // check if sand is lowest among three
-                            double sandPct = percMap.getOrDefault("sand", 0.0);
-                            double siltPct = percMap.getOrDefault("silt", 0.0);
-                            double clayPct = percMap.getOrDefault("clay", 0.0);
-                            if (sandPct <= siltPct && sandPct <= clayPct) {
-                                displayName = "fine sand";
+                    // collect total SPT values for rows within range
+                    double minTotal = Double.POSITIVE_INFINITY;
+                    double maxTotal = Double.NEGATIVE_INFINITY;
+                    for (ObservableList<String> row : table.getItems()) {
+                        try {
+                            double depth = Double.parseDouble(row.get(2));
+                            if (depth >= from && depth <= to) {
+                                String sumStr = row.get(6);
+                                if (sumStr == null || sumStr.isEmpty()) continue;
+                                double val = Double.parseDouble(sumStr);
+                                if (val < minTotal) minTotal = val;
+                                if (val > maxTotal) maxTotal = val;
                             }
+                        } catch (Exception ex) {
+                            // ignore parse errors
                         }
-                        if (!term.isEmpty()) {
-                            if (compSb.length() > 0) compSb.append(", ");
-                            compSb.append(term.toLowerCase()).append(" ").append(displayName);
+                    }
+
+                    if (minTotal == Double.POSITIVE_INFINITY) {
+                        // no spt data in range - skip
+                        continue;
+                    }
+
+                    // Decide which SPT condition table to use
+                    boolean useTable2 = sand > clay;
+
+                    String condLow = mapSptToCondition(minTotal, useTable2);
+                    String condHigh = mapSptToCondition(maxTotal, useTable2);
+                    String conditionPart = condLow.equals(condHigh) ? condLow : condLow + " / " + condHigh;
+
+                    // Map percentages to terms
+                    java.util.Map<String, Double> percMap = new java.util.HashMap<>();
+                    percMap.put("sand", sand);
+                    percMap.put("silt", silt);
+                    percMap.put("clay", clay);
+
+                    // For each percentage get term from Table-1
+                    java.util.Map<String, String> termMap = new java.util.HashMap<>();
+                    for (java.util.Map.Entry<String, Double> e : percMap.entrySet()) {
+                        double pVal = e.getValue();
+                        if (pVal <= 0) continue;
+                        termMap.put(e.getKey(), mapPercentageToTerm(pVal));
+                    }
+
+                    // Order components by percentage desc
+                    java.util.List<java.util.Map.Entry<String, Double>> comps = new java.util.ArrayList<>(percMap.entrySet());
+                    comps.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+                    // Build component string: highest -> NAME (uppercase), others -> "term name"; external rule: if sand lowest call it "fine sand"
+                    StringBuilder compSb = new StringBuilder();
+                    for (int i = 0; i < comps.size(); i++) {
+                        String name = comps.get(i).getKey();
+                        double pct = comps.get(i).getValue();
+                        if (pct <= 0) continue;
+                        if (i == 0) {
+                            compSb.append(name.toUpperCase());
                         } else {
-                            if (compSb.length() > 0) compSb.append(", ");
-                            compSb.append(displayName);
-                        }
-                    }
-                }
-
-                // Compose final description: full color name + condition + components
-                String colorFull = mapColorCode(color);
-                String desc = colorFull;
-                if (!conditionPart.isEmpty()) desc += " " + conditionPart.toLowerCase();
-                if (compSb.length() > 0) desc += " " + compSb.toString();
-
-                // write description only on first matching row to simulate merged cell
-                boolean firstSet = false;
-                for (ObservableList<String> row : table.getItems()) {
-                    try {
-                        double depth = Double.parseDouble(row.get(2));
-                        if (depth >= from && depth <= to) {
-                            if (!firstSet) {
-                                row.set(7, desc);
-                                firstSet = true;
+                            String term = termMap.getOrDefault(name, "");
+                            String displayName = name;
+                            // external rule: if sand is lowest then display 'fine sand'
+                            if (name.equals("sand")) {
+                                double sandPct = percMap.getOrDefault("sand", 0.0);
+                                double siltPct = percMap.getOrDefault("silt", 0.0);
+                                double clayPct = percMap.getOrDefault("clay", 0.0);
+                                if (sandPct <= siltPct && sandPct <= clayPct) {
+                                    displayName = "fine sand";
+                                }
+                            }
+                            if (!term.isEmpty()) {
+                                if (compSb.length() > 0) compSb.append(", ");
+                                compSb.append(term.toLowerCase()).append(" ").append(displayName);
                             } else {
-                                row.set(7, "");
+                                if (compSb.length() > 0) compSb.append(", ");
+                                compSb.append(displayName);
                             }
                         }
-                    } catch (Exception ex) {
-                        // ignore
+                    }
+
+                    // Compose final description: full color name + condition + components
+                    String colorFull = mapColorCode(color);
+                    String desc = colorFull;
+                    if (!conditionPart.isEmpty()) desc += " " + conditionPart.toLowerCase();
+                    if (compSb.length() > 0) desc += " " + compSb.toString();
+
+                    // write description only on first matching row to simulate merged cell
+                    boolean firstSet = false;
+                    for (ObservableList<String> row : table.getItems()) {
+                        try {
+                            double depth = Double.parseDouble(row.get(2));
+                            if (depth >= from && depth <= to) {
+                                if (!firstSet) {
+                                    row.set(7, desc);
+                                    firstSet = true;
+                                } else {
+                                    row.set(7, "");
+                                }
+                            }
+                        } catch (Exception ex) {
+                            // ignore
+                        }
                     }
                 }
             }
@@ -355,15 +368,20 @@ public class RawDataController {
                 }
             }
             
-            DBUtil.insertSptData(
+                String sampleCode = tfSampleId.getText();
+                if (sampleCode == null || sampleCode.trim().isEmpty()) {
+                sampleCode = computeNextSampleCode(Session.selectedBorehole, Session.editLocationId);
+                }
+
+                DBUtil.insertSptData(
                     Session.selectedBorehole,
                     Session.editLocationId,
-                    tfSampleId.getText(),
+                    sampleCode,
                     newDepth,
                     Integer.parseInt(tfN1.getText()),
                     Integer.parseInt(tfN2.getText()),
                     Integer.parseInt(tfN3.getText())
-            );
+                );
             load();
             tfSampleId.clear();
             tfDepth.clear();
@@ -379,6 +397,47 @@ public class RawDataController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Compute next sample code based on existing sample_code values for the borehole+location.
+     * Accepts patterns like LETTERS + NUMBER + optional LETTERS (e.g. D1, D1A, S10B).
+     * Next code will use the same prefix letters if found; numeric part increments to max+1.
+     */
+    private String computeNextSampleCode(int boreholeId, int locationId) {
+        String prefix = "D"; // default prefix
+        int maxNum = 0;
+        Pattern p = Pattern.compile("^([A-Za-z]+)(\\d+)([A-Za-z]*)$");
+        String sql = "SELECT sample_code FROM spt_data WHERE borehole_id=? AND location_id=?";
+        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, boreholeId);
+            ps.setInt(2, locationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String sc = rs.getString("sample_code");
+                    if (sc == null || sc.trim().isEmpty()) continue;
+                    Matcher m = p.matcher(sc.trim());
+                    if (m.matches()) {
+                        String pf = m.group(1);
+                        String numS = m.group(2);
+                        int num = Integer.parseInt(numS);
+                        if (pf != null && !pf.isEmpty()) prefix = pf; // keep latest prefix found
+                        if (num > maxNum) maxNum = num;
+                    } else {
+                        // if no match but has leading letters and digits, try to extract digits
+                        String digits = sc.replaceAll("[^0-9]", "");
+                        if (!digits.isEmpty()) {
+                            int num = Integer.parseInt(digits);
+                            if (num > maxNum) maxNum = num;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        int next = maxNum + 1;
+        return prefix + next;
     }
 
     public void update() {
@@ -453,12 +512,14 @@ public class RawDataController {
 
     public void back(ActionEvent e) {
         try {
-            Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            FXMLLoader f = new FXMLLoader(
+                Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                FXMLLoader f = new FXMLLoader(
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/borehole-dashboard-view.fxml")
-            );
-            s.setScene(new Scene(f.load()));
-            s.centerOnScreen();
+                );
+                Scene sc = new Scene(f.load());
+                sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+                s.setScene(sc);
+                s.centerOnScreen();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -566,38 +627,14 @@ public class RawDataController {
             Session.selectedSptId = sel;
             FXMLLoader f = new FXMLLoader(getClass().getResource("/com/example/sptdataanalysisandreportingtool/analysis-view.fxml"));
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
             s.centerOnScreen();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    @FXML
-    public void fillingSoil(ActionEvent e) {
-        try {
-            ObservableList<String> r = table.getSelectionModel().getSelectedItem();
-            if (r == null) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("No Selection");
-                alert.setHeaderText("No Row Selected");
-                alert.setContentText("Please select a row to apply 'Filling Soil'.");
-                alert.showAndWait();
-                return;
-            }
-
-            // set description only to 'Filling Soil' for the selected row
-            if (r.size() > 7) r.set(7, "Filling Soil");
-            else {
-                // ensure list large enough
-                while (r.size() <= 7) r.add("");
-                r.set(7, "Filling Soil");
-            }
-
-            // refresh table view
-            table.refresh();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+    
 }

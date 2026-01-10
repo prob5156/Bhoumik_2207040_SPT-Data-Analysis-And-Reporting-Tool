@@ -95,7 +95,9 @@ public class BoreholeDashboardController {
                             getClass().getResource("/com/example/sptdataanalysisandreportingtool/rawdata-view.fxml")
                     );
                     Stage s = (Stage) ((Node) ev.getSource()).getScene().getWindow();
-                    s.setScene(new Scene(f.load()));
+                    Scene sc = new Scene(f.load());
+                    sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+                    s.setScene(sc);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -125,7 +127,9 @@ public class BoreholeDashboardController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/edit-location-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -138,7 +142,9 @@ public class BoreholeDashboardController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/client-locations-panel-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

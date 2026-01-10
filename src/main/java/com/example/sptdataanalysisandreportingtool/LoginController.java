@@ -66,7 +66,9 @@ public class LoginController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/client-locations-panel-view.fxml")
                 );
                 Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-                s.setScene(new Scene(f.load()));
+                Scene sc = new Scene(f.load());
+                sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+                s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -84,7 +86,9 @@ public class LoginController {
                     getClass().getResource("senior-login-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -97,7 +101,9 @@ public class LoginController {
                     getClass().getResource("sub-login-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -109,9 +115,20 @@ public class LoginController {
                     getClass().getResource("dashboard-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @FXML
+    private void openRegister(ActionEvent e) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Register");
+        alert.setHeaderText(null);
+        alert.setContentText("Registration is not available in this build.");
+        alert.showAndWait();
     }
 }

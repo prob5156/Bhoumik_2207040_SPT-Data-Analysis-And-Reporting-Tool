@@ -6,85 +6,97 @@
 
 <AnchorPane prefHeight="600" prefWidth="900" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sptdataanalysisandreportingtool.RawDataController">
 
-    <VBox fx:id="rootVBox" prefHeight="707.0" prefWidth="860.0" spacing="12" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
+    <children>
+        <VBox fx:id="rootVBox" prefHeight="707.0" prefWidth="860.0" spacing="12" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
 
-         <Label fx:id="lblHeader" style="-fx-font-size:14; -fx-font-weight:bold;" text="" />
+             <Label fx:id="lblHeader" styleClass="header-large" text="" />
 
-         <Label style="-fx-font-size:20; -fx-font-weight:bold;" text="Raw SPT Data Entry" />
+             <Label style="-fx-font-size:20; -fx-font-weight:bold;" text="Raw SPT Data Entry" />
 
-        <HBox fx:id="hboxEntry" spacing="10">
-            <TextField fx:id="tfSampleId" promptText="Sample ID" />
-            <TextField fx:id="tfDepth" promptText="Depth" />
-            <TextField fx:id="tfN1" promptText="N1(15 cm)" />
-            <TextField fx:id="tfN2" promptText="N2(15 cm)" />
-            <TextField fx:id="tfN3" promptText="N3(15 cm)" />
-            <Button fx:id="btnAdd" onAction="#add" text="Add" />
-        </HBox>
+            <VBox styleClass="pane" spacing="12" prefWidth="820">
+                <children>
+                    <HBox fx:id="hboxEntry" spacing="10" alignment="CENTER_LEFT">
+                        <children>
+                            <TextField fx:id="tfSampleId" promptText="Sample ID" />
+                            <TextField fx:id="tfDepth" promptText="Depth" />
+                            <TextField fx:id="tfN1" promptText="N1(15 cm)" />
+                            <TextField fx:id="tfN2" promptText="N2(15 cm)" />
+                            <TextField fx:id="tfN3" promptText="N3(15 cm)" />
+                            <Button fx:id="btnAdd" onAction="#add" text="Add" />
+                        </children>
+                    </HBox>
 
-        <Label style="-fx-font-size:16; -fx-font-weight:bold;" text="VISUAL CLASSIFICATION" />
+                    <HBox fx:id="hboxVisual" spacing="16">
+                        <children>
+                            <VBox spacing="6">
+                                <Label text="Color" />
+                                <TextField fx:id="tfColor" prefWidth="120" promptText="Color Code" />
+                            </VBox>
 
-        <HBox fx:id="hboxVisual" spacing="15">
-            <VBox prefHeight="39.0" prefWidth="118.0" spacing="5" style="-fx-border-color: #cccccc; -fx-border-radius: 3; -fx-padding: 8;">
-                <Label style="-fx-font-size:12; -fx-font-weight:bold;" text="Color" />
-                <TextField fx:id="tfColor" prefWidth="100" promptText="Color Code" />
+                            <VBox spacing="6">
+                                <Label text="Percentages" />
+                                <HBox spacing="8">
+                                    <children>
+                                        <VBox spacing="4">
+                                            <Label text="Sand" />
+                                            <TextField fx:id="tfSand" prefWidth="80" promptText="Sand %" />
+                                        </VBox>
+                                        <VBox spacing="4">
+                                            <Label text="Silt" />
+                                            <TextField fx:id="tfSilt" prefWidth="80" promptText="Silt %" />
+                                        </VBox>
+                                        <VBox spacing="4">
+                                            <Label text="Clay" />
+                                            <TextField fx:id="tfClay" prefWidth="80" promptText="Clay %" />
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </VBox>
+                        </children>
+                    </HBox>
+
+                    <HBox fx:id="hboxDescribe" spacing="10">
+                        <children>
+                            <TextField fx:id="tfFromFeet" prefWidth="120" promptText="From (feet)" />
+                            <TextField fx:id="tfToFeet" prefWidth="120" promptText="To (feet)" />
+                            <Button fx:id="btnDescribe" onAction="#describe" text="Describe" />
+                        </children>
+                    </HBox>
+
+                    <HBox fx:id="hboxActions" spacing="10">
+                        <children>
+                            <Button fx:id="btnUpdate" onAction="#update" text="Update" />
+                            <Button fx:id="btnDelete" onAction="#delete" text="Delete" />
+                            <Button fx:id="btnAnalysis" onAction="#analysis" text="Analysis" />
+                            <Button fx:id="btnDeleteVisualClassification" onAction="#deleteVisualClassification" text="Delete Classification" />
+                        </children>
+                    </HBox>
+                </children>
             </VBox>
 
-            <VBox spacing="5" style="-fx-border-color: #cccccc; -fx-border-radius: 3; -fx-padding: 8;">
-                <Label style="-fx-font-size:12; -fx-font-weight:bold;" text="Percentages" />
-                <HBox spacing="8">
-                    <VBox spacing="4" alignment="CENTER">
-                        <Label style="-fx-font-size:11; -fx-font-weight:bold;" text="Sand" />
-                        <TextField fx:id="tfSand" prefWidth="80" promptText="Sand %" />
-                    </VBox>
-                    <VBox spacing="4" alignment="CENTER">
-                        <Label style="-fx-font-size:11; -fx-font-weight:bold;" text="Silt" />
-                        <TextField fx:id="tfSilt" prefWidth="80" promptText="Silt %" />
-                    </VBox>
-                    <VBox spacing="4" alignment="CENTER">
-                        <Label style="-fx-font-size:11; -fx-font-weight:bold;" text="Clay" />
-                        <TextField fx:id="tfClay" prefWidth="80" promptText="Clay %" />
-                    </VBox>
-                </HBox>
-            </VBox>
-        </HBox>
+            <TableView fx:id="table" prefHeight="312.0" prefWidth="860.0" editable="true">
+                <columns>
+                    <TableColumn fx:id="colId" prefWidth="120.00000381469727" text="Sample ID" editable="true">
+                        <cellFactory>
+                            <TextFieldTableCell fx:factory="forTableColumn" />
+                        </cellFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="colDepth" prefWidth="70.60000610351562" text="Depth" />
+                    <TableColumn fx:id="colN1" prefWidth="72.19998168945312" text="N1(15 cm)" />
+                    <TableColumn fx:id="colN2" prefWidth="72.20002746582031" text="N2(15 cm)" />
+                    <TableColumn fx:id="colN3" prefWidth="76.20001220703125" text="N3(15 cm)" />
+                    <TableColumn fx:id="colSum" prefWidth="125.5999755859375" text="TOTAL SPT VALUE" />
+                    <TableColumn fx:id="colDescription" prefWidth="375.2000732421875" text="Description of Soil" />
+                </columns>
+            </TableView>
 
-        <VBox spacing="5" style="-fx-border-color: #cccccc; -fx-border-radius: 3; -fx-padding: 8;">
-            <Label style="-fx-font-size:12; -fx-font-weight:bold;" text="FOR" />
+            <Button fx:id="btnBack" onAction="#back" text="Back" />
+
         </VBox>
-         <HBox fx:id="hboxDescribe" spacing="10">
-             <TextField fx:id="tfFromFeet" prefWidth="100" promptText="From (feet)" />
-             <TextField fx:id="tfToFeet" prefWidth="100" promptText="To (feet)" />
-             <Button fx:id="btnDescribe" onAction="#describe" text="Describe" />
-         </HBox>
 
-        <HBox fx:id="hboxActions" spacing="10">
-            <Button fx:id="btnUpdate" onAction="#update" text="Update" />
-            <Button fx:id="btnDelete" onAction="#delete" text="Delete" />
-            <Button fx:id="btnAnalysis" onAction="#analysis" text="Analysis" />
-            <Button fx:id="btnFillingSoil" onAction="#fillingSoil" text="Filling Soil" />
-            <Button fx:id="btnDeleteVisualClassification" onAction="#deleteVisualClassification" text="Delete Classification" />
-        </HBox>
+        <!-- Anchored Analysis button for clients: bottom-right of the AnchorPane -->
+        <Button fx:id="btnAnalysisBottom" onAction="#analysis" text="Analysis"
+                AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" prefWidth="100" />
+    </children>
 
-        <TableView fx:id="table" prefHeight="312.0" prefWidth="860.0" editable="true">
-            <columns>
-                <TableColumn fx:id="colId" prefWidth="120.00000381469727" text="Sample ID" editable="true">
-                    <cellFactory>
-                        <TextFieldTableCell fx:factory="forTableColumn" />
-                    </cellFactory>
-                </TableColumn>
-                <TableColumn fx:id="colDepth" prefWidth="70.60000610351562" text="Depth" />
-                <TableColumn fx:id="colN1" prefWidth="72.19998168945312" text="N1(15 cm)" />
-                <TableColumn fx:id="colN2" prefWidth="72.20002746582031" text="N2(15 cm)" />
-                <TableColumn fx:id="colN3" prefWidth="76.20001220703125" text="N3(15 cm)" />
-                <TableColumn fx:id="colSum" prefWidth="125.5999755859375" text="TOTAL SPT VALUE" />
-                <TableColumn fx:id="colDescription" prefWidth="375.2000732421875" text="Description of Soil" />
-            </columns>
-        </TableView>
-
-        <Button fx:id="btnBack" onAction="#back" text="Back" />
-
-    </VBox>
-    <!-- Anchored Analysis button for clients: bottom-right of the AnchorPane -->
-    <Button fx:id="btnAnalysisBottom" onAction="#analysis" text="Analysis"
-            AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" prefWidth="100" />
 </AnchorPane>

@@ -58,7 +58,9 @@ public class ClientDetailsController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/modifiers-dashboard-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
             s.centerOnScreen();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -72,7 +74,9 @@ public class ClientDetailsController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/modifiers-dashboard-view.fxml")
                 );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
             s.centerOnScreen();
         } catch (Exception ex) {
             ex.printStackTrace();

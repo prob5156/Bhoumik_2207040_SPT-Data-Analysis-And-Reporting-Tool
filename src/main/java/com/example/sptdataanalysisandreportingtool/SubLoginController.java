@@ -26,7 +26,9 @@ public class SubLoginController {
                         getClass().getResource("modifiers-dashboard-view.fxml")
                 );
                 Stage s = (Stage) tfUser.getScene().getWindow();
-                s.setScene(new Scene(f.load()));
+                Scene sc = new Scene(f.load());
+                sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+                s.setScene(sc);
                 s.centerOnScreen();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -41,7 +43,9 @@ public class SubLoginController {
                     getClass().getResource("login-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
             s.centerOnScreen();
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -8,19 +8,29 @@
             fx:controller="com.example.sptdataanalysisandreportingtool.SubLoginController"
             prefWidth="400" prefHeight="300">
 
-    <VBox alignment="CENTER" spacing="15" fillWidth="true"
-          AnchorPane.topAnchor="50"
-          AnchorPane.leftAnchor="50"
-          AnchorPane.rightAnchor="50">
+    <VBox alignment="CENTER" spacing="12.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
+      <children>
+        <Region prefHeight="20" />
+        <VBox fx:id="card" alignment="CENTER" spacing="14.0" styleClass="pane" prefWidth="360">
+          <children>
+            <Label text="Subconductor Engineer Login" styleClass="header-large" />
 
-        <Label text="Subconductor Engineer Login"
-               style="-fx-font-size:18; -fx-font-weight:bold;"/>
+            <VBox spacing="8" prefWidth="280">
+              <children>
+                <TextField fx:id="tfUser" promptText="Username" />
+                <PasswordField fx:id="tfPass" promptText="Password" />
+              </children>
+            </VBox>
 
-        <TextField fx:id="tfUser" promptText="Username"/>
-        <PasswordField fx:id="tfPass" promptText="Password"/>
-
-        <Button text="Login" onAction="#login"/>
-        <Button text="Back" onAction="#back"/>
-
+            <HBox alignment="CENTER" spacing="12">
+              <children>
+                <Button text="Login" onAction="#login" />
+                <Button text="Back" onAction="#back" />
+              </children>
+            </HBox>
+          </children>
+        </VBox>
+        <Region prefHeight="10" />
+      </children>
     </VBox>
 </AnchorPane>

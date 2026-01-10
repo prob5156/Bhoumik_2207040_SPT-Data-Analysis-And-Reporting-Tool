@@ -8,33 +8,39 @@
             fx:controller="com.example.sptdataanalysisandreportingtool.ModifiersDashboardController"
             prefWidth="600" prefHeight="400">
 
-    <VBox spacing="12"
-        AnchorPane.topAnchor="20"
-        AnchorPane.leftAnchor="20"
-        AnchorPane.rightAnchor="20"
-        AnchorPane.bottomAnchor="20">
+    <VBox alignment="CENTER" spacing="12.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="20.0">
+      <children>
+        <Region prefHeight="20" />
+        <VBox fx:id="card" alignment="CENTER" spacing="14.0" styleClass="pane" prefWidth="560">
+          <children>
+            <Label fx:id="lblHeader" text="" styleClass="header-large" />
 
-      <Label fx:id="lblHeader" text="" style="-fx-font-size:14; -fx-font-weight:bold;"/>
+            <HBox alignment="CENTER_LEFT">
+              <children>
+                <Label text="Clients" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnBackModifiers" text="Back" onAction="#back" />
+                <Button fx:id="btnEnterNewClient" text="Enter New Client" onAction="#enterNewClients" />
+              </children>
+            </HBox>
 
-      <HBox alignment="CENTER_LEFT">
-        <Label text="Clients" style="-fx-font-size:22; -fx-font-weight:bold;"/>
-        <Pane HBox.hgrow="ALWAYS" />
-        <Button fx:id="btnBackModifiers" text="Back" onAction="#back" />
-        <Button fx:id="btnEnterNewClient" text="Enter New Client" onAction="#enterNewClients"/>
-      </HBox>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+              <children>
+                <Label text="Search:" />
+                <TextField fx:id="tfSearchClients" promptText="Search clients by name" />
+              </children>
+            </HBox>
 
-      <HBox spacing="8" alignment="CENTER_LEFT">
-        <Label text="Search:" />
-        <TextField fx:id="tfSearchClients" promptText="Search clients by name" />
-      </HBox>
+            <Separator />
 
-      <Separator/>
-
-      <ScrollPane fitToWidth="true" fitToHeight="true">
-        <content>
-          <FlowPane fx:id="flowPaneClients" hgap="12" vgap="12" style="-fx-padding: 10;" />
-        </content>
-      </ScrollPane>
-
+            <ScrollPane fitToWidth="true" fitToHeight="true">
+              <content>
+                <FlowPane fx:id="flowPaneClients" hgap="12" vgap="12" style="-fx-padding: 10;" />
+              </content>
+            </ScrollPane>
+          </children>
+        </VBox>
+        <Region prefHeight="10" />
+      </children>
     </VBox>
 </AnchorPane>

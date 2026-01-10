@@ -8,48 +8,54 @@
             fx:controller="com.example.sptdataanalysisandreportingtool.ClientLocationsPanelController"
             prefWidth="800" prefHeight="600">
 
-    <VBox spacing="15" fillWidth="true"
-          AnchorPane.topAnchor="20"
-          AnchorPane.leftAnchor="20"
-          AnchorPane.rightAnchor="20"
-          AnchorPane.bottomAnchor="20">
+    <VBox alignment="CENTER" spacing="12.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="20.0">
+        <children>
+            <Region prefHeight="20" />
+            <VBox fx:id="card" alignment="CENTER" spacing="14.0" styleClass="pane" prefWidth="720">
+                <children>
+                    <Label fx:id="lblHeader" text="" styleClass="header-large" />
 
-        <Label fx:id="lblHeader" text="" style="-fx-font-size:14; -fx-font-weight:bold;"/>
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <children>
+                            <VBox>
+                                <HBox spacing="20">
+                                    <Label text="Client:" />
+                                    <Label fx:id="lblClientName" text="" />
+                                </HBox>
+                                <HBox spacing="20">
+                                    <Label text="Phone:" />
+                                    <Label fx:id="lblPhoneNumber" text="" />
+                                </HBox>
+                            </VBox>
+                            <Pane HBox.hgrow="ALWAYS" />
+                            <VBox alignment="TOP_RIGHT">
+                                <VBox fx:id="enterActionsBox">
+                                    <Button fx:id="btnEnterNewLocation" text="Enter new location" onAction="#enterNewLocation" />
+                                </VBox>
+                                <Button fx:id="btnBackLocations" text="Back" onAction="#back" />
+                            </VBox>
+                        </children>
+                    </HBox>
 
-        <HBox spacing="20" alignment="CENTER_LEFT">
-            <VBox>
-                <HBox spacing="20">
-                    <Label text="Client:" />
-                    <Label fx:id="lblClientName" text="" style="-fx-font-weight:bold;"/>
-                </HBox>
-                <HBox spacing="20">
-                    <Label text="Phone:" />
-                    <Label fx:id="lblPhoneNumber" text=""/>
-                </HBox>
+                    <Separator />
+
+                    <Label text="Locations" />
+
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="Search:" />
+                            <TextField fx:id="tfSearchLocations" promptText="Search locations by name" />
+                        </children>
+                    </HBox>
+
+                    <ScrollPane fitToWidth="true" fitToHeight="true">
+                        <content>
+                            <FlowPane fx:id="flowPaneLocations" hgap="12" vgap="12" style="-fx-padding: 10;" />
+                        </content>
+                    </ScrollPane>
+                </children>
             </VBox>
-            <Pane HBox.hgrow="ALWAYS" />
-            <VBox alignment="TOP_RIGHT">
-                <VBox fx:id="enterActionsBox">
-                    <Button fx:id="btnEnterNewLocation" text="Enter new location" onAction="#enterNewLocation"/>
-                </VBox>
-                <Button fx:id="btnBackLocations" text="Back" onAction="#back"/>
-            </VBox>
-        </HBox>
-
-        <Separator/>
-
-        <Label text="Locations" style="-fx-font-size:16; -fx-font-weight:bold;"/>
-
-        <HBox spacing="8" alignment="CENTER_LEFT">
-            <Label text="Search:" />
-            <TextField fx:id="tfSearchLocations" promptText="Search locations by name" />
-        </HBox>
-
-        <ScrollPane fitToWidth="true" fitToHeight="true">
-            <content>
-                <FlowPane fx:id="flowPaneLocations" hgap="12" vgap="12" style="-fx-padding: 10;" />
-            </content>
-        </ScrollPane>
-
+            <Region prefHeight="10" />
+        </children>
     </VBox>
 </AnchorPane>

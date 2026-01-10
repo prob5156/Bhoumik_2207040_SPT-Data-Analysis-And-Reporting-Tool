@@ -245,7 +245,9 @@ public class AnalysisController {
         try {
             FXMLLoader f = new FXMLLoader(getClass().getResource("/com/example/sptdataanalysisandreportingtool/rawdata-view.fxml"));
             Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            stage.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

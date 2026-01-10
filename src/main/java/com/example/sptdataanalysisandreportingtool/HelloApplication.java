@@ -15,7 +15,14 @@ public class HelloApplication extends Application {
         FXMLLoader f = new FXMLLoader(
             getClass().getResource("login-view.fxml")
         );
-        stage.setScene(new Scene(f.load()));
+        Scene scene = new Scene(f.load());
+        // load global stylesheet
+        try {
+            scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        } catch (Exception ex) {
+            System.err.println("Failed to load style.css: " + ex.getMessage());
+        }
+        stage.setScene(scene);
         stage.setTitle("SPT Data Analysis Tool");
         stage.show();
     }

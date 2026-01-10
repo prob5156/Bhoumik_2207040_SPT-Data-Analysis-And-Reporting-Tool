@@ -73,7 +73,9 @@ public class EditLocationController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/" + targetView)
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Success");
@@ -103,7 +105,9 @@ public class EditLocationController {
                     getClass().getResource("/com/example/sptdataanalysisandreportingtool/client-locations-panel-view.fxml")
             );
             Stage s = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            s.setScene(new Scene(f.load()));
+            Scene sc = new Scene(f.load());
+            sc.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            s.setScene(sc);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
