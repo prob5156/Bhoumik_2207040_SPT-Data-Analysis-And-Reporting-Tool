@@ -1,0 +1,105 @@
+/* Simplified, safe stylesheet for SPT Data Analysis Tool
+   Avoids chained lookups and custom :root variables which
+   can cause CSS lookup loops or type conversion issues in JavaFX.
+*/
+
+.root {
+    -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    -fx-background-color: #F7FAFC; /* light gray */
+}
+
+/* Container padding */
+.vbox, .hbox, AnchorPane, VBox, HBox {
+    -fx-padding: 12px;
+    -fx-background-color: transparent;
+}
+
+/* Card style for panels */
+.pane, .vbox > .pane, .hbox > .pane {
+    -fx-background-color: #FFFFFF; /* surface */
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(two-pass-box, rgba(34,36,38,0.04), 8, 0, 0, 2);
+}
+
+/* Labels and headers */
+.label {
+    -fx-text-fill: #111827;
+}
+.label#lblHeader {
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #2B6CB0 0%, derive(#2B6CB0, -8%) 100%);
+    -fx-text-fill: white;
+    -fx-background-radius: 6px;
+    -fx-padding: 6 14 6 14;
+    -fx-font-weight: 600;
+}
+.button:hover {
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(43,108,176,0.22), 6, 0, 0, 2);
+}
+.button:disabled {
+    -fx-opacity: 0.6;
+}
+.button.outline {
+    -fx-background-color: transparent;
+    -fx-border-color: derive(#2B6CB0, 20%);
+    -fx-border-width: 1;
+    -fx-text-fill: #2B6CB0;
+}
+
+/* Inputs */
+.text-field, .password-field, .text-area {
+    -fx-background-color: #FBFDFF; /* slightly off-white */
+    -fx-background-radius: 6px;
+    -fx-border-color: rgba(15,23,42,0.06);
+    -fx-border-radius: 6px;
+    -fx-padding: 6 8 6 8;
+}
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: #2B6CB0;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.15), 4, 0, 0, 1);
+}
+
+/* TableView */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 8;
+    -fx-background-radius: 6px;
+}
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+.table-view .column-header, .table-view .column-header .label {
+    -fx-text-fill: #374151;
+    -fx-font-weight: 600;
+}
+.table-row-cell:filled:selected, .table-view .table-row-cell:focused:selected {
+    -fx-background-color: linear-gradient(to right, derive(#2B6CB0, 8%), #2B6CB0);
+    -fx-text-fill: white;
+}
+
+/* TextArea for analysis output */
+.text-area {
+    -fx-font-family: Consolas, "Courier New", monospace;
+}
+
+/* Small helpers */
+.header-large {
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+}
+.footer {
+    -fx-padding: 10 12 10 12;
+    -fx-background-color: transparent;
+}
+
+/* Focus ring for accessibility */
+.focus-ring {
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.18), 6, 0, 0, 0);
+}
